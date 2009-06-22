@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<project name="Coco/R" default="distclean" basedir=".">
+	<target name="usage">
+		<echo message="Ant Targets:"/>
+		<echo message="    clean: Full clean up."/>
+		<echo message="    build: Build Coco/R."/>
+		<echo message="    dist: Generate a distribution JAR file."/>
+		<echo message="    distclean: Like dist, but deletes the generated class files."/>
+		<echo message="    zip: Create a zip file with the Coco/R sources."/>
+		<echo message="    self: Create the parser and scanner from the atg."/>
+	</target>
+	
+	<target name="init">
+		<tstamp/>
+	</target>
+	
+	<target name="build" depends="init">
+		<echo message="Building Coco/R..."/>
+		<javac sourcepath="" srcdir="." destdir="." source="1.4" target="1.4">
+			<include name="*.java"/>
+			<compilerarg value="-Xlint"/>
+		</javac>
+	</target>
+	
+	<target name="dist" depends="build">
+		<echo message="Generating Coco/R jar..."/>
+		<jar
+			destfile="Coco.jar"
+			basedir="."
+			includes="Coco/**/*.class"
+			manifest="Coco.manifest"
+		/>
+	</target>
+	
+	<target name="distclean" depends="dist">
+		<antcall target="cleantemps"/>
+	</target>	
+	
+	<target name="zip">
+		<echo message="Packing Coco/R..."/>
+		<zip
+			destfile="CocoSourcesJava.zip"
+			basedir="."
+			includes="*.atg *.frame *.bat *.java *.manifest *.xml"
+		/>
+	</target>
+	
+	<target name="self">
+		<java jar="Coco.jar" fork="true">
+			<arg line="-package Coco Coco.atg" />
+		</java>
+	</target>
+
+	<target name="cleantemps">
+		<delete dir="Coco"/>
+	</target>
+
+	<target name="clean">
+		<antcall target="cleantemps"/>
+		<delete file="Coco.jar"/>
+	</target>
+
+	<target name="svn-diff">
+		<exec executable="svn">
+			<arg value="diff" />
+			<arg value="--diff-cmd" />
+			<arg value="diff" />
+			<arg value="-x" />
+			<arg value="-uw" />
+		</exec>
+	</target>
+
+</project>
+
