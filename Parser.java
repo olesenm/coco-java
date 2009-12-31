@@ -50,7 +50,7 @@ public class Parser {
 
 	static final int id = 0;
 	static final int str = 1;
-	
+
 	public Trace trace;         // other Coco objects referenced by this ATG
 	public Tab tab;
 	public DFA dfa;
@@ -136,7 +136,7 @@ public class Parser {
 			pgen.usingPos = new Position(beg, la.pos, 0); 
 		}
 		Expect(6);
-		genScanner = true; 
+		genScanner = true;
 		tab.ignored = new CharSet(); 
 		Expect(1);
 		gramName = t.val;
@@ -377,7 +377,7 @@ public class Parser {
 					}
 					Expect(27);
 					if (t.pos > beg)
-					   sym.attrPos = new Position(beg, t.pos, col); 
+					 sym.attrPos = new Position(beg, t.pos, col); 
 				} else SynErr(48);
 			} else if (StartOf(11)) {
 				beg = la.pos; col = la.col; 
@@ -421,7 +421,7 @@ public class Parser {
 					}
 					Expect(30);
 					if (t.pos > beg)
-					   sym.attrPos = new Position(beg, t.pos, col); 
+					 sym.attrPos = new Position(beg, t.pos, col); 
 				} else SynErr(50);
 			} else if (StartOf(11)) {
 				beg = la.pos; col = la.col; 

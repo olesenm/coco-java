@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-Coco.ATG -- Attributed Grammar
+Coco.atg -- Attributed Grammar
 Compiler Generator Coco/R,
 Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
 extended by M. Loeberbauer & A. Woess, Univ. of Linz
@@ -28,14 +28,14 @@ Coco/R itself) does not fall under the GNU General Public License.
 -------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------
  compile with:
-   javac Coco.Coco Coco.ATG -package Coco
+   java -jar Coco.jar Coco.atg -package Coco
 -------------------------------------------------------------------------*/
 
 COMPILER Coco
 
 	static final int id = 0;
 	static final int str = 1;
-	
+
 	public Trace trace;         // other Coco objects referenced by this ATG
 	public Tab tab;
 	public DFA dfa;
@@ -84,7 +84,7 @@ Coco                            (. Symbol sym; Graph g, g1, g2; String gramName;
     { ANY }                      (. pgen.usingPos = new Position(beg, la.pos, 0); .)
   ]
 
-  "COMPILER"                    (. genScanner = true; 
+  "COMPILER"                    (. genScanner = true;
                                    tab.ignored = new CharSet(); .)
   ident                         (. gramName = t.val;
                                    beg = la.pos;
@@ -258,7 +258,7 @@ TokenDecl<int typ>              (. SymInfo s; Symbol sym; Graph g; .)
 /*------------------------------------------------------------------------------------*/
 
 AttrDecl<Symbol sym>            (. int beg, col; .)
-= 
+=
   '<'                           // attributes denoted by < ... >
   ( ('^' | "out")               (. beg = la.pos; .)
     TypeName                    (. sym.retType = scanner.buffer.GetString(beg, la.pos); .)
@@ -267,14 +267,14 @@ AttrDecl<Symbol sym>            (. int beg, col; .)
     | ','                       (. beg = la.pos; col = la.col; .)
       { ANY
       | badString               (. SemErr("bad string in attributes"); .)
-		  } '>'                     (. if (t.pos > beg)
+      } '>'                     (. if (t.pos > beg)
                                      sym.attrPos = new Position(beg, t.pos, col); .)
     )
   |                             (. beg = la.pos; col = la.col; .)
-	  {  ANY
-	  | badString                 (. SemErr("bad string in attributes"); .)
-	  } '>'                       (. if (t.pos > beg)
-	                                   sym.attrPos = new Position(beg, t.pos, col); .)
+      {  ANY
+      | badString                 (. SemErr("bad string in attributes"); .)
+      } '>'                       (. if (t.pos > beg)
+                                       sym.attrPos = new Position(beg, t.pos, col); .)
   )
 |
   "<."                          // attributes denoted by <. ... .>
@@ -285,14 +285,14 @@ AttrDecl<Symbol sym>            (. int beg, col; .)
     | ','                       (. beg = la.pos; col = la.col; .)
       { ANY
       | badString               (. SemErr("bad string in attributes"); .)
-		  } ".>"                    (. if (t.pos > beg)
+      } ".>"                    (. if (t.pos > beg)
                                      sym.attrPos = new Position(beg, t.pos, col); .)
     )
   |                             (. beg = la.pos; col = la.col; .)
-	  {  ANY
-	  | badString                 (. SemErr("bad string in attributes"); .)
-	  } ".>"                      (. if (t.pos > beg)
-	                                   sym.attrPos = new Position(beg, t.pos, col); .)
+      {  ANY
+      | badString                 (. SemErr("bad string in attributes"); .)
+      } ".>"                      (. if (t.pos > beg)
+                                       sym.attrPos = new Position(beg, t.pos, col); .)
   ).
 
 /*------------------------------------------------------------------------------------*/
@@ -488,7 +488,7 @@ Attribs<Node n>                 (. int beg, col; .)
     } '>'                       (. if (t.pos > beg) n.pos = new Position(beg, t.pos, col); .)
   )
 |
-	"<."                          // attributes denoted by <. ... .>
+  "<."                          // attributes denoted by <. ... .>
   ( ('^' | "out")               (. beg = la.pos; .)
     { ANY
     | Bracketed
