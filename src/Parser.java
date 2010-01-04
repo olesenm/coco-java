@@ -49,8 +49,8 @@ public class Parser {
 	public Scanner scanner;
 	public Errors errors;
 
-static final int id = 0;
-	static final int str = 1;
+static final int isIdent   = 0;
+	static final int isLiteral = 1;
 
 	public Trace trace;         // other Coco objects referenced by this ATG
 	public Tab tab;
@@ -211,7 +211,7 @@ static final int id = 0;
 		while (la.kind == 1) {
 			Get();
 			sym = tab.FindSym(t.val);
-			boolean undef = sym == null;
+			boolean undef = (sym == null);
 			if (undef) sym = tab.NewSym(Node.nt, t.val, t.line);
 			else {
 			  if (sym.typ == Node.nt) {
@@ -219,9 +219,9 @@ static final int id = 0;
 			  } else SemErr("this symbol kind not allowed on left side of production");
 			  sym.line = t.line;
 			}
-			boolean noAttrs = sym.attrPos == null;
+			boolean noAttrs = (sym.attrPos == null);
 			sym.attrPos = null;
-			boolean noRet = sym.retVar==null;
+			boolean noRet = (sym.retVar == null);
 			sym.retVar = null;
 			
 			if (la.kind == 25 || la.kind == 30) {
@@ -271,7 +271,9 @@ static final int id = 0;
 		      if (tab.ddt[0]) dfa.PrintStates();
 		    }
 		    System.out.println(" generated");
-		    if (tab.ddt[8]) pgen.WriteStatistics();
+		    if (tab.ddt[8]) {
+		      pgen.WriteStatistics();
+		    }
 		  }
 		}
 		if (tab.ddt[6]) tab.PrintSymbolTable();
@@ -310,7 +312,7 @@ static final int id = 0;
 			Get();
 			g = TokenExpr();
 			Expect(19);
-			if (s.kind == str) SemErr("a literal must not be declared with a structure");
+			if (s.kind == isLiteral) SemErr("a literal must not be declared with a structure");
 			tab.Finish(g);
 			if (tokenString == null || tokenString.equals(noString))
 			  dfa.ConvertToStates(g.l, sym);
@@ -322,7 +324,7 @@ static final int id = 0;
 			}
 			
 		} else if (StartOf(7)) {
-			if (s.kind == id) genScanner = false;
+			if (s.kind == isIdent) genScanner = false;
 			else dfa.MatchLiteral(sym.name, sym);
 			
 		} else SynErr(48);
@@ -536,10 +538,10 @@ static final int id = 0;
 
 	SymInfo  Sym() {
 		SymInfo  s;
-		s = new SymInfo(); s.name = "???"; s.kind = id; 
+		s = new SymInfo(); s.name = "???"; s.kind = isIdent; 
 		if (la.kind == 1) {
 			Get();
-			s.kind = id; s.name = t.val; 
+			s.kind = isIdent; s.name = t.val; 
 		} else if (la.kind == 3 || la.kind == 5) {
 			if (la.kind == 3) {
 				Get();
@@ -548,7 +550,7 @@ static final int id = 0;
 				Get();
 				s.name = "\"" + t.val.substring(1, t.val.length()-1) + "\""; 
 			}
-			s.kind = str;
+			s.kind = isLiteral;
 			if (dfa.ignoreCase) s.name = s.name.toLowerCase();
 			if (s.name.indexOf(' ') >= 0)
 			  SemErr("literal tokens must not contain blanks"); 
@@ -625,11 +627,11 @@ static final int id = 0;
 			}
 			s = Sym();
 			Symbol sym = tab.FindSym(s.name);
-			if (sym == null && s.kind == str)
+			if (sym == null && s.kind == isLiteral)
 			  sym = (Symbol)tab.literals.get(s.name);
-			boolean undef = sym == null;
+			boolean undef = (sym == null);
 			if (undef) {
-			  if (s.kind == id)
+			  if (s.kind == isIdent)
 			    sym = tab.NewSym(Node.nt, s.name, 0);  // forward nt
 			  else if (genScanner) {
 			    sym = tab.NewSym(Node.t, s.name, t.line);
@@ -650,7 +652,7 @@ static final int id = 0;
 			
 			if (la.kind == 25 || la.kind == 30) {
 				Attribs(p);
-				if (s.kind != id) SemErr("a literal must not have attributes"); 
+				if (s.kind == isLiteral) SemErr("a literal must not have attributes"); 
 			}
 			if (undef) {
 			 sym.attrPos = p.pos;  // dummy
@@ -847,11 +849,10 @@ static final int id = 0;
 
 	Graph  TokenFactor() {
 		Graph  g;
-		SymInfo s; 
-		g = null; 
+		SymInfo s; g = null; 
 		if (la.kind == 1 || la.kind == 3 || la.kind == 5) {
 			s = Sym();
-			if (s.kind == id) {
+			if (s.kind == isIdent) {
 			 CharClass c = tab.FindCharClass(s.name);
 			 if (c == null) {
 			   SemErr("undefined name");
