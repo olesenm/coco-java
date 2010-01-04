@@ -212,6 +212,8 @@ public class Tab {
 	public BitSet allSyncSets;        // union of all synchronisation sets
 	public Hashtable literals;        // symbols that are used as literals
 
+	public String grammarName;        // The name of the grammar, set by Coco-java.atg
+
 	public String srcName;            // name of the atg file (including path)
 	public String srcDir;             // directory path of the atg file
 	public String nsName;             // package name for generated files
@@ -1379,6 +1381,12 @@ public class Tab {
 			return ((Symbol) x).name.compareTo(((Symbol) y).name);
 		}
 	}
+
+	public boolean keepCopyright() {
+		return (grammarName.toLowerCase().compareTo("coco") == 0);
+	}
+
+
 }
 
 

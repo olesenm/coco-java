@@ -42,7 +42,7 @@ done
 
 echo "compile Coco executable"
 echo "~~~~~~~~~~~~~~~~~~~~~~~"
-echo "javac -d . $warn *.java"
+echo "javac -d src $warn src/*.java"
 echo
 
 javac -d src $warn src/*.java

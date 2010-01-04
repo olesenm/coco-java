@@ -811,23 +811,32 @@ public class DFA {
     gen.println("\t}");
   }
 
+    void CopyFramePart(String stop, boolean doOutput) {
+        char startCh = stop.charAt(0);
+        int endOfStopString = stop.length()-1;
+        int ch = framRead();
+        while (ch != EOF) {
+            if (ch == startCh) {
+                int i = 0;
+                do {
+                    if (i == endOfStopString) return; // stop[0..i] found
+                    ch = framRead(); i++;
+                } while (ch == stop.charAt(i));
+                // stop[0..i-1] found; continue with last read character
+                if (doOutput)
+                    gen.print(stop.substring(0, i));
+            } else {
+                if (doOutput)
+                    gen.print((char)ch);
+                ch = framRead();
+            }
+        }
+        throw new FatalError("Incomplete or corrupt scanner frame file");
+    }
+
+
   void CopyFramePart(String stop) {
-    char startCh = stop.charAt(0);
-    int endOfStopString = stop.length() - 1;
-    int ch = framRead();
-    while (ch != EOF)
-      if (ch == startCh) {
-        int i = 0;
-        do {
-          if (i == endOfStopString) return; // stop[0..i] found
-          ch = framRead(); i++;
-        } while (ch == stop.charAt(i));
-        // stop[0..i-1] found; continue with last read character
-        gen.print(stop.substring(0, i));
-      } else {
-        gen.print((char)ch); ch = framRead();
-      }
-    throw new FatalError("Incomplete or corrupt scanner frame file");
+    CopyFramePart(stop, true);
   }
 
   String SymName(Symbol sym) {
@@ -938,13 +947,12 @@ public class DFA {
     } catch (FileNotFoundException e) {
       throw new FatalError("Cannot open Scanner.frame.");
     }
-    OpenGen(true);
+
     if (dirtyDFA) MakeDeterministic();
-    CopyFramePart("-->begin");
-    if (!tab.srcName.toLowerCase().endsWith("coco-java.atg")) {
-      gen.close();
-      OpenGen(false);
-    }
+
+    OpenGen(true);
+    CopyFramePart("-->begin", tab.keepCopyright());
+
     /* add package name, if it exists */
     if (tab.nsName != null && tab.nsName.length() > 0) {
       gen.print("package ");

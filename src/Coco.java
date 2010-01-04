@@ -110,6 +110,10 @@ public class Coco {
 				printUsage(null);
 				System.exit(0);
 			}
+			else if (arg[i].charAt(0) == '-') {
+				printUsage("Error: unknown option: '" + arg[i] + "'");
+				System.exit(0);
+			}
 			else if (srcName != null) {
 				printUsage("grammar can only be specified once");
 				System.exit(retVal);

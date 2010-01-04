@@ -80,7 +80,7 @@ public class ParserGen {
   // --------------------------------------------------------------------------
 
   void Indent (int n) {
-    for (int i = 1; i <= n; i++) gen.print('\t');
+    for (int i = 0; i < n; ++i) gen.print('\t');
   }
 
   boolean Overlaps (BitSet s1, BitSet s2) {
@@ -112,24 +112,33 @@ public class ParserGen {
     return nAlts > 5;
   }
 
-  void CopyFramePart (String stop) {
-    char startCh = stop.charAt(0);
-    int endOfStopString = stop.length()-1;
-    int ch = framRead();
-    while (ch != EOF)
-      if (ch == startCh) {
-        int i = 0;
-        do {
-          if (i == endOfStopString) return; // stop[0..i] found
-          ch = framRead(); i++;
-        } while (ch == stop.charAt(i));
-        // stop[0..i-1] found; continue with last read character
-        gen.print(stop.substring(0, i));
-      } else {
-        gen.print((char)ch); ch = framRead();
-      }
-    throw new FatalError("Incomplete or corrupt parser frame file");
+    void CopyFramePart(String stop, boolean doOutput) {
+        char startCh = stop.charAt(0);
+        int endOfStopString = stop.length()-1;
+        int ch = framRead();
+        while (ch != EOF) {
+            if (ch == startCh) {
+                int i = 0;
+                do {
+                    if (i == endOfStopString) return; // stop[0..i] found
+                    ch = framRead(); i++;
+                } while (ch == stop.charAt(i));
+                // stop[0..i-1] found; continue with last read character
+                if (doOutput)
+                    gen.print(stop.substring(0, i));
+            } else {
+                if (doOutput)
+                    gen.print((char)ch);
+                ch = framRead();
+            }
+        }
+        throw new FatalError("Incomplete or corrupt parser frame file");
   }
+
+  void CopyFramePart(String stop) {
+      CopyFramePart(stop, true);
+  }
+
 
   void CopySourcePart (Position pos, int indent) {
     // Copy text described by pos from atg to gen
@@ -137,7 +146,7 @@ public class ParserGen {
     if (pos != null) {
       buffer.setPos(pos.beg); ch = buffer.Read();
       Indent(indent);
-      done: while (buffer.getPos() <= pos.end) {
+      Done: while (buffer.getPos() <= pos.end) {
         while (ch == CR || ch == LF) {  // eol is either CR or CRLF or LF
           gen.println(); Indent(indent);
           if (ch == CR) { ch = buffer.Read(); }  // skip CR
@@ -147,7 +156,7 @@ public class ParserGen {
             ch = buffer.Read();
           }
           if (i <= pos.col) pos.col = i - 1; // heading TABs => not enough blanks
-          if (buffer.getPos() > pos.end) break done;
+          if (buffer.getPos() > pos.end) break Done;
         }
         gen.print((char)ch);
         ch = buffer.Read();
@@ -417,7 +426,7 @@ public class ParserGen {
     } catch (FileNotFoundException e) {
       throw new FatalError("Cannot open Parser.frame.");
     }
-    OpenGen(true);
+
     err = new StringWriter();
     //foreach (Symbol sym in Symbol.terminals)
     for (int i = 0; i < tab.terminals.size(); i++) {
@@ -425,11 +434,9 @@ public class ParserGen {
       GenErrorMsg(tErr, sym);
     }
 
-    CopyFramePart("-->begin");
-    if (!tab.srcName.toLowerCase().endsWith("coco-java.atg")) {
-      gen.close();
-      OpenGen(false);
-    }
+    OpenGen(true);
+    CopyFramePart("-->begin", tab.keepCopyright());
+
     if (tab.nsName != null && tab.nsName.length() > 0) {
       gen.print("package ");
       gen.print(tab.nsName);

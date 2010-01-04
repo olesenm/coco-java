@@ -132,7 +132,7 @@ static final int id = 0;
 	}
 
 	void Coco() {
-		Symbol sym; Graph g; String gramName; CharSet s; int beg; 
+		Symbol sym; Graph g; CharSet s; int beg; 
 		if (StartOf(1)) {
 			Get();
 			beg = t.pos; 
@@ -145,7 +145,7 @@ static final int id = 0;
 		genScanner = true;
 		tab.ignored = new CharSet(); 
 		Expect(1);
-		gramName = t.val;
+		tab.grammarName = t.val;
 		beg = la.pos;
 		
 		while (StartOf(2)) {
@@ -244,9 +244,9 @@ static final int id = 0;
 		}
 		Expect(20);
 		Expect(1);
-		if (gramName.compareTo(t.val) != 0)
+		if (tab.grammarName.compareTo(t.val) != 0)
 		 SemErr("name does not match grammar name");
-		tab.gramSy = tab.FindSym(gramName);
+		tab.gramSy = tab.FindSym(tab.grammarName);
 		if (tab.gramSy == null)
 		  SemErr("missing production for grammar name");
 		else {
