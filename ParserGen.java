@@ -66,7 +66,7 @@ public class ParserGen {
 
   Tab tab;           // other Coco objects
   Trace trace;
-  Errors errors;
+  //UNUSED Errors errors;
   Buffer buffer;
 
   private int framRead() {
@@ -88,22 +88,22 @@ public class ParserGen {
     for (int i = 0; i < len; ++i) {
       if (s1.get(i) && s2.get(i)) {
         return true;
-	  }
-	}
-	return false;
+      }
+    }
+    return false;
   }
 
   // AW: use a switch if more than 5 alternatives and none starts with a resolver
   boolean UseSwitch (Node p) {
-	BitSet s1, s2;
+    BitSet s1, s2;
     if (p.typ != Node.alt) return false;
     int nAlts = 0;
     s1 = new BitSet(tab.terminals.size());
     while (p != null) {
-	  s2 = tab.Expected0(p.sub, curSy);
-	  // must not optimize with switch statement, if there are ll1 warnings
-	  if (Overlaps(s1, s2)) { return false; }
-	  s1.or(s2);
+      s2 = tab.Expected0(p.sub, curSy);
+      // must not optimize with switch statement, if there are ll1 warnings
+      if (Overlaps(s1, s2)) { return false; }
+      s1.or(s2);
       ++nAlts;
       // must not optimize with switch-statement, if alt uses a resolver expression
       if (p.sub.typ == Node.rslv) return false;
@@ -405,7 +405,7 @@ public class ParserGen {
   }
 
   public void WriteParser () {
-		int oldPos = buffer.getPos();  // Buffer.pos is modified by CopySourcePart
+    int oldPos = buffer.getPos();  // Buffer.pos is modified by CopySourcePart
     symSet.add(tab.allSyncSets);
     File fr = new File(tab.srcDir, "Parser.frame");
     if (!fr.exists()) {
@@ -447,6 +447,12 @@ public class ParserGen {
     CopyFramePart("-->pragmas"); GenCodePragmas();
     CopyFramePart("-->productions"); GenProductions();
     CopyFramePart("-->parseRoot"); gen.println("\t\t" + tab.gramSy.name + "();");
+    if (tab.explicitEof) {
+      gen.println("\t\t// let grammar deal with end-of-file expectations");
+    }
+    else {
+      gen.println("\t\tExpect(0); // expect end-of-file automatically added");
+    }
     CopyFramePart("-->initialization"); InitSets();
     CopyFramePart("-->errors"); gen.print(err.toString());
     CopyFramePart("$$$");
@@ -464,12 +470,15 @@ public class ParserGen {
   }
 
   public ParserGen (Parser parser) {
-		tab = parser.tab;
-		errors = parser.errors;
-		trace = parser.trace;
-		buffer = parser.scanner.buffer;
+    tab = parser.tab;
+    //UNUSED errors = parser.errors;
+    trace = parser.trace;
+    buffer = parser.scanner.buffer;
     errorNr = -1;
     usingPos = null;
   }
 
 }
+
+
+// ************************************************************************* //

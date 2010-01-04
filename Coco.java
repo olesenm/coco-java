@@ -47,18 +47,79 @@ import java.io.File;
 
 public class Coco {
 
+	public static void printUsage (String mesage) {
+		System.out.println
+		(
+			"Usage: Coco Grammar.atg {Option}\n" +
+			"Options:\n" +
+			"  -package <Name>      eg, My.Package.Name\n" +
+			"  -frames  <Dir>       for frames not in the source directory\n" +
+			"  -trace   <String>    trace with output to trace.txt\n" +
+			"  -o       <Dir>       output directory\n" +
+			"  -help                print this usage\n" +
+			"\nValid characters in the trace string:\n" +
+			"  A  trace automaton\n" +
+			"  F  list first/follow sets\n" +
+			"  G  print syntax graph\n" +
+			"  I  trace computation of first sets\n" +
+			"  J  list ANY and SYNC sets\n" +
+			"  P  print statistics\n" +
+			"  S  list symbol table\n" +
+			"  X  list cross reference table\n" +
+			"Scanner.frame and Parser.frame must be located in one of these directories:\n" +
+			"  1. The same directory as the atg grammar.\n" +
+			"  2. In the specified -frames directory.\n" +
+			"\nhttp://www.ssw.uni-linz.ac.at/coco/\n\n"
+		);
+	}
+
 	public static void main (String[] arg) {
-		System.out.println("Coco/R (Jun 22, 2009)");
+		System.out.println("Coco/R (04 Jan 2010)");
 		String srcName = null, nsName = null, frameDir = null, ddtString = null, outDir = null;
 		int retVal = 1;
 		for (int i = 0; i < arg.length; i++) {
-			if (arg[i].compareTo("-package") == 0 && i < arg.length - 1) nsName = arg[++i];
-			else if (arg[i].compareTo("-frames") == 0 && i < arg.length - 1) frameDir = arg[++i];
-			else if (arg[i].compareTo("-trace") == 0 && i < arg.length - 1) ddtString = arg[++i];
-			else if (arg[i].compareTo("-o") == 0 && i < arg.length - 1) outDir = arg[++i];
-			else srcName = arg[i];
+			if (arg[i].compareTo("-package") == 0) {
+				if (++i == arg.length) {
+					printUsage("missing parameter on -package");
+					System.exit(retVal);
+				}
+				nsName = arg[i];
+			}
+			else if (arg[i].compareTo("-frames") == 0) {
+				if (++i == arg.length) {
+					printUsage("missing parameter on -frames");
+					System.exit(retVal);
+				}
+				frameDir = arg[i];
+			}
+			else if (arg[i].compareTo("-trace") == 0) {
+				if (++i == arg.length) {
+					printUsage("missing parameter on -trace");
+					System.exit(retVal);
+				}
+				ddtString = arg[i];
+			}
+			else if (arg[i].compareTo("-o") == 0) {
+				if (++i == arg.length) {
+					printUsage("missing parameter on -o");
+					System.exit(retVal);
+				}
+				outDir = arg[i];
+			}
+			else if (arg[i].compareTo("-help") == 0) {
+				printUsage(null);
+				System.exit(0);
+			}
+			else if (srcName != null) {
+				printUsage("grammar can only be specified once");
+				System.exit(retVal);
+			}
+			else {
+				srcName = arg[i];
+			}
 		}
-		if (arg.length > 0 && srcName != null) {
+
+		if (srcName != null) {
 			try {
 				String srcDir = new File(srcName).getParent();
 
@@ -86,27 +147,12 @@ public class Coco {
 				System.out.println(e.getMessage());
 			}
 		} else {
-			System.out.println(
-				"Usage: Coco Grammar.ATG {Option}\n" +
-				"Options:\n" +
-				"  -package <packageName>\n" +
-				"  -frames  <frameFilesDirectory>\n" +
-				"  -trace   <traceString>\n" +
-				"  -o       <outputDirectory>\n" +
-				"Valid characters in the trace string:\n" +
-				"  A  trace automaton\n" +
-				"  F  list first/follow sets\n" +
-				"  G  print syntax graph\n" +
-				"  I  trace computation of first sets\n" +
-				"  J  list ANY and SYNC sets\n" +
-				"  P  print statistics\n" +
-				"  S  list symbol table\n" +
-				"  X  list cross reference table\n" +
-				"Scanner.frame and Parser.frame files needed in ATG directory\n" +
-				"or in a directory specified in the -frames option.\n"
-			);
+			printUsage(null);
 		}
 		System.exit(retVal);
 	}
 
 } // end Coco
+
+
+// ************************************************************************* //

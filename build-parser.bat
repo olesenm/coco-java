@@ -1,1 +1,1 @@
-java -jar Coco.jar Coco.ATG -package Coco
+java -jar Coco.jar Coco.atg

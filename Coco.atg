@@ -32,6 +32,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 -------------------------------------------------------------------------*/
 
 COMPILER Coco
+$package=Coco   // grammar directive
 
 	static final int id = 0;
 	static final int str = 1;
@@ -67,6 +68,9 @@ TOKENS
 
 PRAGMAS
   ddtSym    = '$' { digit | letter }.  (. tab.SetDDT(la.val); .)
+  directive = '$' letter { letter } '='
+        { digit | letter | '-' | '.' | ':' } .
+                                (. tab.DispatchDirective(la.val); .)
 
 COMMENTS FROM "/*" TO "*/" NESTED
 COMMENTS FROM "//" TO lf

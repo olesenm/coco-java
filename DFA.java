@@ -82,11 +82,11 @@ class State {               // state of finite automaton
 //  Action
 //-----------------------------------------------------------------------------
 
-class Action {      // action of finite automaton
-  public int typ;         // type of action symbol: clas, chr
-  public int sym;         // action symbol
-  public int tc;          // transition code: normalTrans, contextTrans
-  public Target target;   // states reached from this action
+class Action {                  // action of finite automaton
+  public int typ;               // type of action symbol: clas, chr
+  public int sym;               // action symbol
+  public int tc;                // transition code: normalTrans, contextTrans
+  public Target target;         // states reached from this action
   public Action next;
 
   public Action(int typ, int sym, int tc) {
@@ -308,10 +308,10 @@ public class DFA {
   public boolean dirtyDFA;     // DFA may become nondeterministic in MatchLiteral
   public boolean hasCtxMoves;  // DFA has context transitions
 
-	Parser parser;               // other Coco objects
-	Tab tab;
-	Errors errors;
-	Trace trace;
+  Parser parser;               // other Coco objects
+  Tab tab;
+  Errors errors;
+  Trace trace;
 
   private int framRead() {
     try {
@@ -334,11 +334,11 @@ public class DFA {
   }
 
   private void PutRange(CharSet s) {
-  	for (CharSet.Range r = s.head; r != null; r = r.next) {
-    	if (r.from == r.to) { gen.print("ch == " + Ch((char) r.from)); }
-    	else if (r.from == 0) { gen.print("ch <= " + Ch((char) r.to)); }
-    	else { gen.print("ch >= " + Ch((char) r.from) + " && ch <= " + Ch((char) r.to)); }
-    	if (r.next != null) gen.print(" || ");
+    for (CharSet.Range r = s.head; r != null; r = r.next) {
+      if (r.from == r.to) { gen.print("ch == " + Ch((char) r.from)); }
+      else if (r.from == 0) { gen.print("ch <= " + Ch((char) r.to)); }
+      else { gen.print("ch >= " + Ch((char) r.from) + " && ch <= " + Ch((char) r.to)); }
+      if (r.next != null) gen.print(" || ");
     }
   }
 
@@ -730,9 +730,9 @@ public class DFA {
     return null;
   }
 
-	//------------------------- comments ----------------------------
+  //------------------------- comments ----------------------------
 
-	public Comment firstComment;  // list of comments
+  public Comment firstComment;  // list of comments
 
   String CommentStr(Node p) {
     StringBuffer s = new StringBuffer();
@@ -754,11 +754,11 @@ public class DFA {
   }
 
   public void NewComment(Node from, Node to, boolean nested) {
-		Comment c = new Comment(CommentStr(from), CommentStr(to), nested);
-		c.next = firstComment; firstComment = c;
-	}
+    Comment c = new Comment(CommentStr(from), CommentStr(to), nested);
+    c.next = firstComment; firstComment = c;
+  }
 
-	//--------------------- scanner generation ------------------------
+  //--------------------- scanner generation ------------------------
 
   void GenComBody(Comment com) {
     gen.println("\t\t\tfor(;;) {");
@@ -1017,3 +1017,5 @@ public class DFA {
 
 }
 
+
+// ************************************************************************* //

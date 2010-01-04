@@ -203,7 +203,8 @@ class CharClass {
 public class Tab {
 	public Position semDeclPos;        // position of global semantic declarations
 	public CharSet ignored;            // characters ignored by the scanner
-	public boolean[] ddt = new boolean[10];	// debug and test switches
+	public boolean explicitEof;        // user must explicitly add EOF in grammar
+	public boolean[] ddt = new boolean[10]; // debug and test switches
 	public Symbol gramSy;              // root nonterminal; filled by ATG
 	public Symbol eofSy;               // end of file symbol
 	public Symbol noSym;               // used in case of an error
@@ -1313,6 +1314,46 @@ public class Tab {
 		trace.WriteLine(); trace.WriteLine();
 	}
 
+	public void DispatchDirective(String str) {
+		int len1 = str.indexOf('=');
+		int len2 = str.length() - len1 - 1;
+
+		if (len1 < 0 || len2 < 1)
+		{
+			return;
+		}
+		String name = str.substring(0, len1);
+		String strval = str.substring(len1+1);
+		if (name.compareTo("$package") == 0)
+		{
+			// set package only if not already set
+			if (nsName == null)
+			{
+				nsName = strval;
+			}
+			System.out.println("using package: '" + nsName + "'");
+		}
+		else if (name.compareTo("$trace") == 0)
+		{
+			SetDDT(strval);
+		}
+		else if (name.compareTo("$eof") == 0)
+		{
+			if (strval.compareTo("true") == 0) {
+				explicitEof = true;
+			} else if (strval.compareTo("false") == 0) {
+				explicitEof = false;
+			}
+			else {
+				System.out.println("ignoring unknown boolean value for pragma: '" + name + "' = '" + strval + "'");
+			}
+		}
+		else
+		{
+			System.out.println("ignoring unknown pragma: '" + name + "'");
+		}
+	}
+
 	public void SetDDT (String s) {
 		s = s.toUpperCase();
 		for (int i = 0; i < s.length(); i++) {
@@ -1338,3 +1379,6 @@ public class Tab {
 		}
 	}
 }
+
+
+// ************************************************************************* //
