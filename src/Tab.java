@@ -201,26 +201,27 @@ class CharClass {
 //===========================================================
 
 public class Tab {
-	public Position semDeclPos;        // position of global semantic declarations
-	public CharSet ignored;            // characters ignored by the scanner
-	public boolean explicitEof;        // user must explicitly add EOF in grammar
+	public Position semDeclPos;       // position of global semantic declarations
+	public Position initCodePos;      // position of initialization code
+	public CharSet ignored;           // characters ignored by the scanner
+	public boolean explicitEof;       // user must explicitly add EOF in grammar
 	public boolean[] ddt = new boolean[10]; // debug and test switches
-	public Symbol gramSy;              // root nonterminal; filled by ATG
-	public Symbol eofSy;               // end of file symbol
-	public Symbol noSym;               // used in case of an error
-	public BitSet allSyncSets;         // union of all synchronisation sets
-	public Hashtable literals;         // symbols that are used as literals
+	public Symbol gramSy;             // root nonterminal; filled by ATG
+	public Symbol eofSy;              // end of file symbol
+	public Symbol noSym;              // used in case of an error
+	public BitSet allSyncSets;        // union of all synchronisation sets
+	public Hashtable literals;        // symbols that are used as literals
 
-	public String srcName;             // name of the atg file (including path)
-	public String srcDir;              // directory path of the atg file
-	public String nsName;              // package name for generated files
-	public String frameDir;            // directory containing the frame files
-	public String outDir;              // directory for generated files
+	public String srcName;            // name of the atg file (including path)
+	public String srcDir;             // directory path of the atg file
+	public String nsName;             // package name for generated files
+	public String frameDir;           // directory containing the frame files
+	public String outDir;             // directory for generated files
 
-	BitSet visited;                    // mark list for graph traversals
-	Symbol curSy;                      // current symbol in computation of sets
+	BitSet visited;                   // mark list for graph traversals
+	Symbol curSy;                     // current symbol in computation of sets
 
-	Parser parser;                     // other Coco objects
+	Parser parser;                    // other Coco objects
 	Trace trace;
 	Errors errors;
 

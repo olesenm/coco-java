@@ -941,7 +941,7 @@ public class DFA {
     OpenGen(true);
     if (dirtyDFA) MakeDeterministic();
     CopyFramePart("-->begin");
-    if (!tab.srcName.toLowerCase().endsWith("coco.atg")) {
+    if (!tab.srcName.toLowerCase().endsWith("coco-java.atg")) {
       gen.close();
       OpenGen(false);
     }

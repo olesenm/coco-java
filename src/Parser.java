@@ -1,4 +1,4 @@
-/*-------------------------------------------------------------------------
+/*-------------------------------*- Java -*---------------------------------
 Compiler Generator Coco/R,
 Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
 extended by M. Loeberbauer & A. Woess, Univ. of Linz
@@ -34,9 +34,9 @@ public class Parser {
 	public static final int _string = 3;
 	public static final int _badString = 4;
 	public static final int _char = 5;
-	public static final int maxT = 44;
-	public static final int _ddtSym = 45;
-	public static final int _directive = 46;
+	public static final int maxT = 45;
+	public static final int _ddtSym = 46;
+	public static final int _directive = 47;
 
 	static final boolean T = true;
 	static final boolean x = false;
@@ -49,7 +49,7 @@ public class Parser {
 	public Scanner scanner;
 	public Errors errors;
 
-	static final int id = 0;
+static final int id = 0;
 	static final int str = 1;
 
 	public Trace trace;         // other Coco objects referenced by this ATG
@@ -68,6 +68,8 @@ public class Parser {
 	public Parser(Scanner scanner) {
 		this.scanner = scanner;
 		errors = new Errors();
+		// user-defined initialization:
+
 	}
 
 	void SynErr (int n) {
@@ -89,10 +91,10 @@ public class Parser {
 				break;
 			}
 
-			if (la.kind == 45) {
+			if (la.kind == 46) {
 				tab.SetDDT(la.val); 
 			}
-			if (la.kind == 46) {
+			if (la.kind == 47) {
 				tab.DispatchDirective(la.val); 
 			}
 			la = t;
@@ -130,7 +132,7 @@ public class Parser {
 	}
 
 	void Coco() {
-		Symbol sym; Graph g, g1, g2; String gramName; CharSet s; int beg; 
+		Symbol sym; Graph g; String gramName; CharSet s; int beg; 
 		if (StartOf(1)) {
 			Get();
 			beg = t.pos; 
@@ -152,46 +154,57 @@ public class Parser {
 		tab.semDeclPos = new Position(beg, la.pos, 0); 
 		if (la.kind == 7) {
 			Get();
-			dfa.ignoreCase = true; 
+			if (StartOf(3)) {
+				Get();
+				beg = t.pos; 
+				while (StartOf(3)) {
+					Get();
+				}
+				tab.initCodePos = new Position(beg, la.pos, 0); 
+			}
 		}
 		if (la.kind == 8) {
+			Get();
+			dfa.ignoreCase = true; 
+		}
+		if (la.kind == 9) {
 			Get();
 			while (la.kind == 1) {
 				SetDecl();
 			}
 		}
-		if (la.kind == 9) {
+		if (la.kind == 10) {
 			Get();
 			while (la.kind == 1 || la.kind == 3 || la.kind == 5) {
 				TokenDecl(Node.t);
 			}
 		}
-		if (la.kind == 10) {
+		if (la.kind == 11) {
 			Get();
 			while (la.kind == 1 || la.kind == 3 || la.kind == 5) {
 				TokenDecl(Node.pr);
 			}
 		}
-		while (la.kind == 11) {
+		while (la.kind == 12) {
 			Get();
-			boolean nested = false; 
-			Expect(12);
-			g1 = TokenExpr();
+			Graph g1, g2; boolean nested = false; 
 			Expect(13);
+			g1 = TokenExpr();
+			Expect(14);
 			g2 = TokenExpr();
-			if (la.kind == 14) {
+			if (la.kind == 15) {
 				Get();
 				nested = true; 
 			}
 			dfa.NewComment(g1.l, g2.l, nested); 
 		}
-		while (la.kind == 15) {
+		while (la.kind == 16) {
 			Get();
 			s = Set();
 			tab.ignored.Or(s); 
 		}
-		while (!(la.kind == 0 || la.kind == 16)) {SynErr(45); Get();}
-		Expect(16);
+		while (!(la.kind == 0 || la.kind == 17)) {SynErr(46); Get();}
+		Expect(17);
 		if (genScanner) dfa.MakeDeterministic();
 		tab.DeleteNodes();
 		
@@ -211,7 +224,7 @@ public class Parser {
 			boolean noRet = sym.retVar==null;
 			sym.retVar = null;
 			
-			if (la.kind == 24 || la.kind == 29) {
+			if (la.kind == 25 || la.kind == 30) {
 				AttrDecl(sym);
 			}
 			if (!undef)
@@ -219,17 +232,17 @@ public class Parser {
 			   || noRet != (sym.retVar == null))
 			   SemErr("attribute mismatch between declaration and use of this symbol");
 			
-			if (la.kind == 42) {
+			if (la.kind == 43) {
 				sym.semPos = SemText();
 			}
-			ExpectWeak(17, 3);
+			ExpectWeak(18, 4);
 			g = Expression();
 			sym.graph = g.l;
 			tab.Finish(g);
 			
-			ExpectWeak(18, 4);
+			ExpectWeak(19, 5);
 		}
-		Expect(19);
+		Expect(20);
 		Expect(1);
 		if (gramName.compareTo(t.val) != 0)
 		 SemErr("name does not match grammar name");
@@ -263,7 +276,7 @@ public class Parser {
 		}
 		if (tab.ddt[6]) tab.PrintSymbolTable();
 		
-		Expect(18);
+		Expect(19);
 	}
 
 	void SetDecl() {
@@ -273,12 +286,12 @@ public class Parser {
 		CharClass c = tab.FindCharClass(name);
 		if (c != null) SemErr("name declared twice");
 		
-		Expect(17);
+		Expect(18);
 		s = Set();
 		if (s.Elements() == 0) SemErr("character set must not be empty");
 		c = tab.NewCharClass(name, s);
 		
-		Expect(18);
+		Expect(19);
 	}
 
 	void TokenDecl(int typ) {
@@ -292,11 +305,11 @@ public class Parser {
 		}
 		tokenString = null;
 		
-		while (!(StartOf(5))) {SynErr(46); Get();}
-		if (la.kind == 17) {
+		while (!(StartOf(6))) {SynErr(47); Get();}
+		if (la.kind == 18) {
 			Get();
 			g = TokenExpr();
-			Expect(18);
+			Expect(19);
 			if (s.kind == str) SemErr("a literal must not be declared with a structure");
 			tab.Finish(g);
 			if (tokenString == null || tokenString.equals(noString))
@@ -308,12 +321,12 @@ public class Parser {
 			  dfa.MatchLiteral(tokenString, sym);
 			}
 			
-		} else if (StartOf(6)) {
+		} else if (StartOf(7)) {
 			if (s.kind == id) genScanner = false;
 			else dfa.MatchLiteral(sym.name, sym);
 			
-		} else SynErr(47);
-		if (la.kind == 42) {
+		} else SynErr(48);
+		if (la.kind == 43) {
 			sym.semPos = SemText();
 			if (typ != Node.pr) SemErr("semantic action not allowed here"); 
 		}
@@ -324,7 +337,7 @@ public class Parser {
 		Graph g2; 
 		g = TokenTerm();
 		boolean first = true; 
-		while (WeakSeparator(33,7,8) ) {
+		while (WeakSeparator(34,8,9) ) {
 			g2 = TokenTerm();
 			if (first) { tab.MakeFirstAlt(g); first = false; }
 			tab.MakeAlternative(g, g2);
@@ -337,8 +350,8 @@ public class Parser {
 		CharSet  s;
 		CharSet s2; 
 		s = SimSet();
-		while (la.kind == 20 || la.kind == 21) {
-			if (la.kind == 20) {
+		while (la.kind == 21 || la.kind == 22) {
+			if (la.kind == 21) {
 				Get();
 				s2 = SimSet();
 				s.Or(s2); 
@@ -353,10 +366,10 @@ public class Parser {
 
 	void AttrDecl(Symbol sym) {
 		int beg, col; 
-		if (la.kind == 24) {
+		if (la.kind == 25) {
 			Get();
-			if (la.kind == 25 || la.kind == 26) {
-				if (la.kind == 25) {
+			if (la.kind == 26 || la.kind == 27) {
+				if (la.kind == 26) {
 					Get();
 				} else {
 					Get();
@@ -366,41 +379,41 @@ public class Parser {
 				sym.retType = scanner.buffer.GetString(beg, la.pos); 
 				Expect(1);
 				sym.retVar = t.val; 
-				if (la.kind == 27) {
+				if (la.kind == 28) {
 					Get();
-				} else if (la.kind == 28) {
+				} else if (la.kind == 29) {
 					Get();
 					beg = la.pos; col = la.col; 
-					while (StartOf(9)) {
-						if (StartOf(10)) {
+					while (StartOf(10)) {
+						if (StartOf(11)) {
 							Get();
 						} else {
 							Get();
 							SemErr("bad string in attributes"); 
 						}
 					}
-					Expect(27);
+					Expect(28);
 					if (t.pos > beg)
 					 sym.attrPos = new Position(beg, t.pos, col); 
-				} else SynErr(48);
-			} else if (StartOf(11)) {
+				} else SynErr(49);
+			} else if (StartOf(12)) {
 				beg = la.pos; col = la.col; 
-				while (StartOf(12)) {
-					if (StartOf(13)) {
+				while (StartOf(13)) {
+					if (StartOf(14)) {
 						Get();
 					} else {
 						Get();
 						SemErr("bad string in attributes"); 
 					}
 				}
-				Expect(27);
+				Expect(28);
 				if (t.pos > beg)
 				 sym.attrPos = new Position(beg, t.pos, col); 
-			} else SynErr(49);
-		} else if (la.kind == 29) {
+			} else SynErr(50);
+		} else if (la.kind == 30) {
 			Get();
-			if (la.kind == 25 || la.kind == 26) {
-				if (la.kind == 25) {
+			if (la.kind == 26 || la.kind == 27) {
+				if (la.kind == 26) {
 					Get();
 				} else {
 					Get();
@@ -410,46 +423,46 @@ public class Parser {
 				sym.retType = scanner.buffer.GetString(beg, la.pos); 
 				Expect(1);
 				sym.retVar = t.val; 
-				if (la.kind == 30) {
+				if (la.kind == 31) {
 					Get();
-				} else if (la.kind == 28) {
+				} else if (la.kind == 29) {
 					Get();
 					beg = la.pos; col = la.col; 
-					while (StartOf(14)) {
-						if (StartOf(15)) {
+					while (StartOf(15)) {
+						if (StartOf(16)) {
 							Get();
 						} else {
 							Get();
 							SemErr("bad string in attributes"); 
 						}
 					}
-					Expect(30);
+					Expect(31);
 					if (t.pos > beg)
 					 sym.attrPos = new Position(beg, t.pos, col); 
-				} else SynErr(50);
-			} else if (StartOf(11)) {
+				} else SynErr(51);
+			} else if (StartOf(12)) {
 				beg = la.pos; col = la.col; 
-				while (StartOf(16)) {
-					if (StartOf(17)) {
+				while (StartOf(17)) {
+					if (StartOf(18)) {
 						Get();
 					} else {
 						Get();
 						SemErr("bad string in attributes"); 
 					}
 				}
-				Expect(30);
+				Expect(31);
 				if (t.pos > beg)
 				 sym.attrPos = new Position(beg, t.pos, col); 
-			} else SynErr(51);
-		} else SynErr(52);
+			} else SynErr(52);
+		} else SynErr(53);
 	}
 
 	Position  SemText() {
 		Position  pos;
-		Expect(42);
+		Expect(43);
 		int beg = la.pos; int col = la.col; 
-		while (StartOf(18)) {
-			if (StartOf(19)) {
+		while (StartOf(19)) {
+			if (StartOf(20)) {
 				Get();
 			} else if (la.kind == 4) {
 				Get();
@@ -459,7 +472,7 @@ public class Parser {
 				SemErr("missing end of previous semantic action"); 
 			}
 		}
-		Expect(43);
+		Expect(44);
 		pos = new Position(beg, t.pos, col); 
 		return pos;
 	}
@@ -469,7 +482,7 @@ public class Parser {
 		Graph g2; 
 		g = Term();
 		boolean first = true; 
-		while (WeakSeparator(33,20,21) ) {
+		while (WeakSeparator(34,21,22) ) {
 			g2 = Term();
 			if (first) { tab.MakeFirstAlt(g); first = false; }
 			tab.MakeAlternative(g, g2);
@@ -497,15 +510,15 @@ public class Parser {
 		} else if (la.kind == 5) {
 			n1 = Char();
 			s.Set(n1); 
-			if (la.kind == 22) {
+			if (la.kind == 23) {
 				Get();
 				n2 = Char();
 				for (int i = n1; i <= n2; i++) s.Set(i); 
 			}
-		} else if (la.kind == 23) {
+		} else if (la.kind == 24) {
 			Get();
 			s = new CharSet(); s.Fill(); 
-		} else SynErr(53);
+		} else SynErr(54);
 		return s;
 	}
 
@@ -539,27 +552,27 @@ public class Parser {
 			if (dfa.ignoreCase) s.name = s.name.toLowerCase();
 			if (s.name.indexOf(' ') >= 0)
 			  SemErr("literal tokens must not contain blanks"); 
-		} else SynErr(54);
+		} else SynErr(55);
 		return s;
 	}
 
 	void TypeName() {
 		Expect(1);
-		while (la.kind == 18 || la.kind == 24 || la.kind == 31) {
-			if (la.kind == 18) {
+		while (la.kind == 19 || la.kind == 25 || la.kind == 32) {
+			if (la.kind == 19) {
 				Get();
 				Expect(1);
-			} else if (la.kind == 31) {
+			} else if (la.kind == 32) {
 				Get();
-				Expect(32);
+				Expect(33);
 			} else {
 				Get();
 				TypeName();
-				while (la.kind == 28) {
+				while (la.kind == 29) {
 					Get();
 					TypeName();
 				}
-				Expect(27);
+				Expect(28);
 			}
 		}
 	}
@@ -567,8 +580,8 @@ public class Parser {
 	Graph  Term() {
 		Graph  g;
 		Graph g2; Node rslv = null; g = null; 
-		if (StartOf(22)) {
-			if (la.kind == 40) {
+		if (StartOf(23)) {
+			if (la.kind == 41) {
 				rslv = tab.NewNode(Node.rslv, null, la.line); 
 				rslv.pos = Resolver();
 				g = new Graph(rslv);                       
@@ -577,13 +590,13 @@ public class Parser {
 			if (rslv != null) tab.MakeSequence(g, g2);
 			else g = g2;
 			
-			while (StartOf(23)) {
+			while (StartOf(24)) {
 				g2 = Factor();
 				tab.MakeSequence(g, g2); 
 			}
-		} else if (StartOf(24)) {
+		} else if (StartOf(25)) {
 			g = new Graph(tab.NewNode(Node.eps, null, 0)); 
-		} else SynErr(55);
+		} else SynErr(56);
 		if (g == null) // invalid start of Term
 		 g = new Graph(tab.NewNode(Node.eps, null, 0));
 		
@@ -592,8 +605,8 @@ public class Parser {
 
 	Position  Resolver() {
 		Position  pos;
-		Expect(40);
-		Expect(35);
+		Expect(41);
+		Expect(36);
 		int beg = la.pos; int col = la.col; 
 		Condition();
 		pos = new Position(beg, t.pos, col); 
@@ -605,8 +618,8 @@ public class Parser {
 		SymInfo s; Position pos; boolean weak = false;
 		g = null; 
 		switch (la.kind) {
-		case 1: case 3: case 5: case 34: {
-			if (la.kind == 34) {
+		case 1: case 3: case 5: case 35: {
+			if (la.kind == 35) {
 				Get();
 				weak = true; 
 			}
@@ -635,7 +648,7 @@ public class Parser {
 			Node p = tab.NewNode(typ, sym, t.line);
 			g = new Graph(p);
 			
-			if (la.kind == 24 || la.kind == 29) {
+			if (la.kind == 25 || la.kind == 30) {
 				Attribs(p);
 				if (s.kind != id) SemErr("a literal must not have attributes"); 
 			}
@@ -648,27 +661,27 @@ public class Parser {
 			
 			break;
 		}
-		case 35: {
+		case 36: {
 			Get();
 			g = Expression();
-			Expect(36);
+			Expect(37);
 			break;
 		}
-		case 31: {
+		case 32: {
 			Get();
 			g = Expression();
-			Expect(32);
+			Expect(33);
 			tab.MakeOption(g); 
 			break;
 		}
-		case 37: {
+		case 38: {
 			Get();
 			g = Expression();
-			Expect(38);
+			Expect(39);
 			tab.MakeIteration(g); 
 			break;
 		}
-		case 42: {
+		case 43: {
 			pos = SemText();
 			Node p = tab.NewNode(Node.sem, null, 0);
 			p.pos = pos;
@@ -676,21 +689,21 @@ public class Parser {
 			
 			break;
 		}
-		case 23: {
+		case 24: {
 			Get();
 			Node p = tab.NewNode(Node.any, null, 0);  // p.set is set in tab.SetupAnys
 			g = new Graph(p);
 			
 			break;
 		}
-		case 39: {
+		case 40: {
 			Get();
 			Node p = tab.NewNode(Node.sync, null, 0);
 			g = new Graph(p);
 			
 			break;
 		}
-		default: SynErr(56); break;
+		default: SynErr(57); break;
 		}
 		if (g == null) // invalid start of Factor
 		 g = new Graph(tab.NewNode(Node.eps, null, 0));
@@ -700,19 +713,19 @@ public class Parser {
 
 	void Attribs(Node n) {
 		int beg, col; 
-		if (la.kind == 24) {
+		if (la.kind == 25) {
 			Get();
-			if (la.kind == 25 || la.kind == 26) {
-				if (la.kind == 25) {
+			if (la.kind == 26 || la.kind == 27) {
+				if (la.kind == 26) {
 					Get();
 				} else {
 					Get();
 				}
 				beg = la.pos; 
-				while (StartOf(25)) {
-					if (StartOf(26)) {
+				while (StartOf(26)) {
+					if (StartOf(27)) {
 						Get();
-					} else if (la.kind == 31 || la.kind == 35) {
+					} else if (la.kind == 32 || la.kind == 36) {
 						Bracketed();
 					} else {
 						Get();
@@ -720,48 +733,48 @@ public class Parser {
 					}
 				}
 				n.retVar = scanner.buffer.GetString(beg, la.pos); 
-				if (la.kind == 27) {
+				if (la.kind == 28) {
 					Get();
-				} else if (la.kind == 28) {
+				} else if (la.kind == 29) {
 					Get();
 					beg = la.pos; col = la.col; 
-					while (StartOf(9)) {
-						if (StartOf(10)) {
+					while (StartOf(10)) {
+						if (StartOf(11)) {
 							Get();
 						} else {
 							Get();
 							SemErr("bad string in attributes"); 
 						}
 					}
-					Expect(27);
+					Expect(28);
 					if (t.pos > beg) n.pos = new Position(beg, t.pos, col); 
-				} else SynErr(57);
-			} else if (StartOf(11)) {
+				} else SynErr(58);
+			} else if (StartOf(12)) {
 				beg = la.pos; col = la.col; 
-				while (StartOf(12)) {
-					if (StartOf(13)) {
+				while (StartOf(13)) {
+					if (StartOf(14)) {
 						Get();
 					} else {
 						Get();
 						SemErr("bad string in attributes"); 
 					}
 				}
-				Expect(27);
+				Expect(28);
 				if (t.pos > beg) n.pos = new Position(beg, t.pos, col); 
-			} else SynErr(58);
-		} else if (la.kind == 29) {
+			} else SynErr(59);
+		} else if (la.kind == 30) {
 			Get();
-			if (la.kind == 25 || la.kind == 26) {
-				if (la.kind == 25) {
+			if (la.kind == 26 || la.kind == 27) {
+				if (la.kind == 26) {
 					Get();
 				} else {
 					Get();
 				}
 				beg = la.pos; 
-				while (StartOf(27)) {
-					if (StartOf(28)) {
+				while (StartOf(28)) {
+					if (StartOf(29)) {
 						Get();
-					} else if (la.kind == 31 || la.kind == 35) {
+					} else if (la.kind == 32 || la.kind == 36) {
 						Bracketed();
 					} else {
 						Get();
@@ -769,65 +782,65 @@ public class Parser {
 					}
 				}
 				n.retVar = scanner.buffer.GetString(beg, la.pos); 
-				if (la.kind == 30) {
+				if (la.kind == 31) {
 					Get();
-				} else if (la.kind == 28) {
+				} else if (la.kind == 29) {
 					Get();
 					beg = la.pos; col = la.col; 
-					while (StartOf(14)) {
-						if (StartOf(15)) {
+					while (StartOf(15)) {
+						if (StartOf(16)) {
 							Get();
 						} else {
 							Get();
 							SemErr("bad string in attributes"); 
 						}
 					}
-					Expect(30);
+					Expect(31);
 					if (t.pos > beg) n.pos = new Position(beg, t.pos, col); 
-				} else SynErr(59);
-			} else if (StartOf(11)) {
+				} else SynErr(60);
+			} else if (StartOf(12)) {
 				beg = la.pos; col = la.col; 
-				while (StartOf(16)) {
-					if (StartOf(17)) {
+				while (StartOf(17)) {
+					if (StartOf(18)) {
 						Get();
 					} else {
 						Get();
 						SemErr("bad string in attributes"); 
 					}
 				}
-				Expect(30);
+				Expect(31);
 				if (t.pos > beg) n.pos = new Position(beg, t.pos, col); 
-			} else SynErr(60);
-		} else SynErr(61);
+			} else SynErr(61);
+		} else SynErr(62);
 	}
 
 	void Condition() {
-		while (StartOf(29)) {
-			if (la.kind == 35) {
+		while (StartOf(30)) {
+			if (la.kind == 36) {
 				Get();
 				Condition();
 			} else {
 				Get();
 			}
 		}
-		Expect(36);
+		Expect(37);
 	}
 
 	Graph  TokenTerm() {
 		Graph  g;
 		Graph g2; 
 		g = TokenFactor();
-		while (StartOf(7)) {
+		while (StartOf(8)) {
 			g2 = TokenFactor();
 			tab.MakeSequence(g, g2); 
 		}
-		if (la.kind == 41) {
+		if (la.kind == 42) {
 			Get();
-			Expect(35);
+			Expect(36);
 			g2 = TokenExpr();
 			tab.SetContextTrans(g2.l); dfa.hasCtxMoves = true;
 			tab.MakeSequence(g, g2); 
-			Expect(36);
+			Expect(37);
 		}
 		return g;
 	}
@@ -853,48 +866,48 @@ public class Parser {
 			  else tokenString = noString;
 			}
 			
-		} else if (la.kind == 35) {
+		} else if (la.kind == 36) {
 			Get();
 			g = TokenExpr();
-			Expect(36);
-		} else if (la.kind == 31) {
+			Expect(37);
+		} else if (la.kind == 32) {
 			Get();
 			g = TokenExpr();
-			Expect(32);
+			Expect(33);
 			tab.MakeOption(g); 
-		} else if (la.kind == 37) {
+		} else if (la.kind == 38) {
 			Get();
 			g = TokenExpr();
-			Expect(38);
+			Expect(39);
 			tab.MakeIteration(g); 
-		} else SynErr(62);
+		} else SynErr(63);
 		if (g == null) // invalid start of TokenFactor
 		 g = new Graph(tab.NewNode(Node.eps, null, 0)); 
 		return g;
 	}
 
 	void Bracketed() {
-		if (la.kind == 35) {
-			Get();
-			while (StartOf(29)) {
-				if (la.kind == 31 || la.kind == 35) {
-					Bracketed();
-				} else {
-					Get();
-				}
-			}
-			Expect(36);
-		} else if (la.kind == 31) {
+		if (la.kind == 36) {
 			Get();
 			while (StartOf(30)) {
-				if (la.kind == 31 || la.kind == 35) {
+				if (la.kind == 32 || la.kind == 36) {
 					Bracketed();
 				} else {
 					Get();
 				}
 			}
-			Expect(32);
-		} else SynErr(63);
+			Expect(37);
+		} else if (la.kind == 32) {
+			Get();
+			while (StartOf(31)) {
+				if (la.kind == 32 || la.kind == 36) {
+					Bracketed();
+				} else {
+					Get();
+				}
+			}
+			Expect(33);
+		} else SynErr(64);
 	}
 
 
@@ -909,37 +922,38 @@ public class Parser {
 	}
 
 	private static final boolean[][] set = {
-		{T,T,x,T, x,T,x,x, x,x,T,T, x,x,x,T, T,T,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,T,x, x,x},
-		{x,T,T,T, T,T,x,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,x},
-		{x,T,T,T, T,T,T,x, x,x,x,x, T,T,T,x, x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,x},
-		{T,T,x,T, x,T,x,x, x,x,T,T, x,x,x,T, T,T,T,x, x,x,x,T, x,x,x,x, x,x,x,T, x,T,T,T, x,T,x,T, T,x,T,x, x,x},
-		{T,T,x,T, x,T,x,x, x,x,T,T, x,x,x,T, T,T,x,T, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,T,x, x,x},
-		{T,T,x,T, x,T,x,x, x,x,T,T, x,x,x,T, T,T,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,T,x, x,x},
-		{x,T,x,T, x,T,x,x, x,x,T,T, x,x,x,T, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,T,x, x,x},
-		{x,T,x,T, x,T,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,T, x,x,x,T, x,T,x,x, x,x,x,x, x,x},
-		{x,x,x,x, x,x,x,x, x,x,x,T, x,T,T,T, T,x,T,x, x,x,x,x, x,x,x,x, x,x,x,x, T,x,x,x, T,x,T,x, x,x,x,x, x,x},
-		{x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,x, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,x},
-		{x,T,T,T, x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,x, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,x},
-		{x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,x,x,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,x},
-		{x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,x,x,x, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,x},
-		{x,T,T,T, x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,x,x,x, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,x},
-		{x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,x,T, T,T,T,T, T,T,T,T, T,T,T,T, T,x},
-		{x,T,T,T, x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,x,T, T,T,T,T, T,T,T,T, T,T,T,T, T,x},
-		{x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,x,x,T, T,T,x,T, T,T,T,T, T,T,T,T, T,T,T,T, T,x},
-		{x,T,T,T, x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,x,x,T, T,T,x,T, T,T,T,T, T,T,T,T, T,T,T,T, T,x},
-		{x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,x, T,x},
-		{x,T,T,T, x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,x,x, T,x},
-		{x,T,x,T, x,T,x,x, x,x,x,x, x,x,x,x, x,x,T,x, x,x,x,T, x,x,x,x, x,x,x,T, T,T,T,T, T,T,T,T, T,x,T,x, x,x},
-		{x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,T,x, x,x,x,x, x,x,x,x, x,x,x,x, T,x,x,x, T,x,T,x, x,x,x,x, x,x},
-		{x,T,x,T, x,T,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,T, x,x,x,x, x,x,x,T, x,x,T,T, x,T,x,T, T,x,T,x, x,x},
-		{x,T,x,T, x,T,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,T, x,x,x,x, x,x,x,T, x,x,T,T, x,T,x,T, x,x,T,x, x,x},
-		{x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,T,x, x,x,x,x, x,x,x,x, x,x,x,x, T,T,x,x, T,x,T,x, x,x,x,x, x,x},
-		{x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,x, x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,x},
-		{x,T,T,T, x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,x, x,T,T,x, T,T,T,x, T,T,T,T, T,T,T,T, T,x},
-		{x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, x,T,x,T, T,T,T,T, T,T,T,T, T,T,T,T, T,x},
-		{x,T,T,T, x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, x,T,x,x, T,T,T,x, T,T,T,T, T,T,T,T, T,x},
-		{x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, x,T,T,T, T,T,T,T, T,x},
-		{x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, x,T,T,T, T,T,T,T, T,T,T,T, T,x}
+		{T,T,x,T, x,T,x,x, x,x,x,T, T,x,x,x, T,T,T,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,T, x,x,x},
+		{x,T,T,T, T,T,x,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,x},
+		{x,T,T,T, T,T,T,x, x,x,x,x, x,T,T,T, x,x,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,x},
+		{x,T,T,T, T,T,T,T, x,x,x,x, x,T,T,T, x,x,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,x},
+		{T,T,x,T, x,T,x,x, x,x,x,T, T,x,x,x, T,T,T,T, x,x,x,x, T,x,x,x, x,x,x,x, T,x,T,T, T,x,T,x, T,T,x,T, x,x,x},
+		{T,T,x,T, x,T,x,x, x,x,x,T, T,x,x,x, T,T,T,x, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,T, x,x,x},
+		{T,T,x,T, x,T,x,x, x,x,x,T, T,x,x,x, T,T,T,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,T, x,x,x},
+		{x,T,x,T, x,T,x,x, x,x,x,T, T,x,x,x, T,T,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,T, x,x,x},
+		{x,T,x,T, x,T,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, T,x,x,x, T,x,T,x, x,x,x,x, x,x,x},
+		{x,x,x,x, x,x,x,x, x,x,x,x, T,x,T,T, T,T,x,T, x,x,x,x, x,x,x,x, x,x,x,x, x,T,x,x, x,T,x,T, x,x,x,x, x,x,x},
+		{x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,x},
+		{x,T,T,T, x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,x},
+		{x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,x,x, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,x},
+		{x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,x,x, x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,x},
+		{x,T,T,T, x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,x,x, x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,x},
+		{x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,x, T,T,T,T, T,T,T,T, T,T,T,T, T,T,x},
+		{x,T,T,T, x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,x, T,T,T,T, T,T,T,T, T,T,T,T, T,T,x},
+		{x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,x,x, T,T,T,x, T,T,T,T, T,T,T,T, T,T,T,T, T,T,x},
+		{x,T,T,T, x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,x,x, T,T,T,x, T,T,T,T, T,T,T,T, T,T,T,T, T,T,x},
+		{x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, x,T,x},
+		{x,T,T,T, x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,x, x,T,x},
+		{x,T,x,T, x,T,x,x, x,x,x,x, x,x,x,x, x,x,x,T, x,x,x,x, T,x,x,x, x,x,x,x, T,T,T,T, T,T,T,T, T,T,x,T, x,x,x},
+		{x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,T, x,x,x,x, x,x,x,x, x,x,x,x, x,T,x,x, x,T,x,T, x,x,x,x, x,x,x},
+		{x,T,x,T, x,T,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, T,x,x,x, x,x,x,x, T,x,x,T, T,x,T,x, T,T,x,T, x,x,x},
+		{x,T,x,T, x,T,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, T,x,x,x, x,x,x,x, T,x,x,T, T,x,T,x, T,x,x,T, x,x,x},
+		{x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,T, x,x,x,x, x,x,x,x, x,x,x,x, x,T,T,x, x,T,x,T, x,x,x,x, x,x,x},
+		{x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, x,x,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,x},
+		{x,T,T,T, x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, x,x,T,T, x,T,T,T, x,T,T,T, T,T,T,T, T,T,x},
+		{x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,x,T,x, T,T,T,T, T,T,T,T, T,T,T,T, T,T,x},
+		{x,T,T,T, x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,x,T,x, x,T,T,T, x,T,T,T, T,T,T,T, T,T,x},
+		{x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,x,T,T, T,T,T,T, T,T,x},
+		{x,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,T,T,T, T,x,T,T, T,T,T,T, T,T,T,T, T,T,x}
 
 	};
 } // end Parser
@@ -971,63 +985,64 @@ class Errors {
 			case 4: s = "badString expected"; break;
 			case 5: s = "char expected"; break;
 			case 6: s = "\"COMPILER\" expected"; break;
-			case 7: s = "\"IGNORECASE\" expected"; break;
-			case 8: s = "\"CHARACTERS\" expected"; break;
-			case 9: s = "\"TOKENS\" expected"; break;
-			case 10: s = "\"PRAGMAS\" expected"; break;
-			case 11: s = "\"COMMENTS\" expected"; break;
-			case 12: s = "\"FROM\" expected"; break;
-			case 13: s = "\"TO\" expected"; break;
-			case 14: s = "\"NESTED\" expected"; break;
-			case 15: s = "\"IGNORE\" expected"; break;
-			case 16: s = "\"PRODUCTIONS\" expected"; break;
-			case 17: s = "\"=\" expected"; break;
-			case 18: s = "\".\" expected"; break;
-			case 19: s = "\"END\" expected"; break;
-			case 20: s = "\"+\" expected"; break;
-			case 21: s = "\"-\" expected"; break;
-			case 22: s = "\"..\" expected"; break;
-			case 23: s = "\"ANY\" expected"; break;
-			case 24: s = "\"<\" expected"; break;
-			case 25: s = "\"^\" expected"; break;
-			case 26: s = "\"out\" expected"; break;
-			case 27: s = "\">\" expected"; break;
-			case 28: s = "\",\" expected"; break;
-			case 29: s = "\"<.\" expected"; break;
-			case 30: s = "\".>\" expected"; break;
-			case 31: s = "\"[\" expected"; break;
-			case 32: s = "\"]\" expected"; break;
-			case 33: s = "\"|\" expected"; break;
-			case 34: s = "\"WEAK\" expected"; break;
-			case 35: s = "\"(\" expected"; break;
-			case 36: s = "\")\" expected"; break;
-			case 37: s = "\"{\" expected"; break;
-			case 38: s = "\"}\" expected"; break;
-			case 39: s = "\"SYNC\" expected"; break;
-			case 40: s = "\"IF\" expected"; break;
-			case 41: s = "\"CONTEXT\" expected"; break;
-			case 42: s = "\"(.\" expected"; break;
-			case 43: s = "\".)\" expected"; break;
-			case 44: s = "??? expected"; break;
-			case 45: s = "this symbol not expected in Coco"; break;
-			case 46: s = "this symbol not expected in TokenDecl"; break;
-			case 47: s = "invalid TokenDecl"; break;
-			case 48: s = "invalid AttrDecl"; break;
+			case 7: s = "\"INITIALIZE\" expected"; break;
+			case 8: s = "\"IGNORECASE\" expected"; break;
+			case 9: s = "\"CHARACTERS\" expected"; break;
+			case 10: s = "\"TOKENS\" expected"; break;
+			case 11: s = "\"PRAGMAS\" expected"; break;
+			case 12: s = "\"COMMENTS\" expected"; break;
+			case 13: s = "\"FROM\" expected"; break;
+			case 14: s = "\"TO\" expected"; break;
+			case 15: s = "\"NESTED\" expected"; break;
+			case 16: s = "\"IGNORE\" expected"; break;
+			case 17: s = "\"PRODUCTIONS\" expected"; break;
+			case 18: s = "\"=\" expected"; break;
+			case 19: s = "\".\" expected"; break;
+			case 20: s = "\"END\" expected"; break;
+			case 21: s = "\"+\" expected"; break;
+			case 22: s = "\"-\" expected"; break;
+			case 23: s = "\"..\" expected"; break;
+			case 24: s = "\"ANY\" expected"; break;
+			case 25: s = "\"<\" expected"; break;
+			case 26: s = "\"^\" expected"; break;
+			case 27: s = "\"out\" expected"; break;
+			case 28: s = "\">\" expected"; break;
+			case 29: s = "\",\" expected"; break;
+			case 30: s = "\"<.\" expected"; break;
+			case 31: s = "\".>\" expected"; break;
+			case 32: s = "\"[\" expected"; break;
+			case 33: s = "\"]\" expected"; break;
+			case 34: s = "\"|\" expected"; break;
+			case 35: s = "\"WEAK\" expected"; break;
+			case 36: s = "\"(\" expected"; break;
+			case 37: s = "\")\" expected"; break;
+			case 38: s = "\"{\" expected"; break;
+			case 39: s = "\"}\" expected"; break;
+			case 40: s = "\"SYNC\" expected"; break;
+			case 41: s = "\"IF\" expected"; break;
+			case 42: s = "\"CONTEXT\" expected"; break;
+			case 43: s = "\"(.\" expected"; break;
+			case 44: s = "\".)\" expected"; break;
+			case 45: s = "??? expected"; break;
+			case 46: s = "this symbol not expected in Coco"; break;
+			case 47: s = "this symbol not expected in TokenDecl"; break;
+			case 48: s = "invalid TokenDecl"; break;
 			case 49: s = "invalid AttrDecl"; break;
 			case 50: s = "invalid AttrDecl"; break;
 			case 51: s = "invalid AttrDecl"; break;
 			case 52: s = "invalid AttrDecl"; break;
-			case 53: s = "invalid SimSet"; break;
-			case 54: s = "invalid Sym"; break;
-			case 55: s = "invalid Term"; break;
-			case 56: s = "invalid Factor"; break;
-			case 57: s = "invalid Attribs"; break;
+			case 53: s = "invalid AttrDecl"; break;
+			case 54: s = "invalid SimSet"; break;
+			case 55: s = "invalid Sym"; break;
+			case 56: s = "invalid Term"; break;
+			case 57: s = "invalid Factor"; break;
 			case 58: s = "invalid Attribs"; break;
 			case 59: s = "invalid Attribs"; break;
 			case 60: s = "invalid Attribs"; break;
 			case 61: s = "invalid Attribs"; break;
-			case 62: s = "invalid TokenFactor"; break;
-			case 63: s = "invalid Bracketed"; break;
+			case 62: s = "invalid Attribs"; break;
+			case 63: s = "invalid TokenFactor"; break;
+			case 64: s = "invalid Bracketed"; break;
 			default: s = "error " + n; break;
 		}
 		printMsg(line, col, s);

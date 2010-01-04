@@ -47,7 +47,7 @@
 	
 	<target name="self">
 		<java jar="Coco.jar" fork="true">
-			<arg line="-package Coco Coco.atg" />
+			<arg line="-package Coco Coco-java.atg" />
 		</java>
 	</target>
 

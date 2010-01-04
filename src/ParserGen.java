@@ -426,7 +426,7 @@ public class ParserGen {
     }
 
     CopyFramePart("-->begin");
-    if (!tab.srcName.toLowerCase().endsWith("coco.atg")) {
+    if (!tab.srcName.toLowerCase().endsWith("coco-java.atg")) {
       gen.close();
       OpenGen(false);
     }
@@ -444,6 +444,9 @@ public class ParserGen {
     gen.println("\tpublic static final int maxT = " + (tab.terminals.size()-1) + ";");
     GenPragmas();
     CopyFramePart("-->declarations"); CopySourcePart(tab.semDeclPos, 0);
+    CopyFramePart("-->constructor");
+    CopySourcePart(tab.initCodePos, 2);
+
     CopyFramePart("-->pragmas"); GenCodePragmas();
     CopyFramePart("-->productions"); GenProductions();
     CopyFramePart("-->parseRoot"); gen.println("\t\t" + tab.gramSy.name + "();");

@@ -1,1 +1,1 @@
-java -jar Coco.jar src/Coco.atg
+java -jar Coco.jar src/Coco-java.atg

@@ -1,4 +1,4 @@
-/*-------------------------------------------------------------------------
+/*-------------------------------*- Java -*---------------------------------
 Compiler Generator Coco/R,
 Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
 extended by M. Loeberbauer & A. Woess, Univ. of Linz
@@ -40,11 +40,13 @@ public class Parser {
 	public Scanner scanner;
 	public Errors errors;
 
-	-->declarations
+-->declarations
 
 	public Parser(Scanner scanner) {
 		this.scanner = scanner;
 		errors = new Errors();
+		// user-defined initialization:
+-->constructor
 	}
 
 	void SynErr (int n) {

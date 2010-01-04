@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-Coco.atg -- Attributed Grammar
+Coco-java.atg -- Attributed Grammar for Coco/R Java version
 Compiler Generator Coco/R,
 Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
 extended by M. Loeberbauer & A. Woess, Univ. of Linz
@@ -28,7 +28,7 @@ Coco/R itself) does not fall under the GNU General Public License.
 -------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------
  compile with:
-   java -jar Coco.jar Coco.atg -package Coco
+   java -jar Coco.jar Coco-java.atg -package Coco
 -------------------------------------------------------------------------*/
 
 COMPILER Coco
@@ -81,7 +81,7 @@ IGNORE cr + lf + tab
 
 PRODUCTIONS
 
-Coco                            (. Symbol sym; Graph g, g1, g2; String gramName; CharSet s; int beg; .)
+Coco                            (. Symbol sym; Graph g; String gramName; CharSet s; int beg; .)
 =
   [ // import statements
     ANY                          (. beg = t.pos; .)
@@ -94,11 +94,19 @@ Coco                            (. Symbol sym; Graph g, g1, g2; String gramName;
                                    beg = la.pos;
                                  .)
   { ANY }                       (. tab.semDeclPos = new Position(beg, la.pos, 0); .)
+
+  // this section can be used to add code to the constructor
+  [ "INITIALIZE"
+    [ ANY                       (. beg = t.pos; .)
+      { ANY }                   (. tab.initCodePos = new Position(beg, la.pos, 0); .)
+    ]
+  ]
+
   [ "IGNORECASE"                (. dfa.ignoreCase = true; .) ]   /* pdt */
   [ "CHARACTERS" { SetDecl }]
   [ "TOKENS"  { TokenDecl<Node.t> }]
   [ "PRAGMAS" { TokenDecl<Node.pr> }]
-  { "COMMENTS"                  (. boolean nested = false; .)
+  { "COMMENTS"                  (. Graph g1, g2; boolean nested = false; .)
     "FROM" TokenExpr<out g1>
     "TO" TokenExpr<out g2>
     [ "NESTED"                  (. nested = true; .)
