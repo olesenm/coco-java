@@ -29,11 +29,19 @@
 core
 
 # ignore generated classes
-/Coco
-/Coco.manifest
+/src/Coco
 
 # ignore Doxygen docs
 /html
+
+# ignore autoconf files
+/Makefile
+/config.log
+/config.status
+/src/Makefile
+/src/coco-java
+
+autom4te.cache
 
 # source packages - anywhere
 *.tar.bz2

@@ -45,17 +45,16 @@ echo "~~~~~~~~~~~~~~~~~~~~~~~"
 echo "javac -d . $warn *.java"
 echo
 
-javac -d . $warn *.java
+javac -d src $warn src/*.java
 if [ $? -eq 0 ]
 then
     echo
     echo "done"
-    echo
     echo "create Coco.jar file"
+    echo "    jar cfm Coco.jar src/Coco.manifest -C src Coco"
     echo
-    jar cfm Coco.jar Coco.manifest Coco/*.class
-    rm -f Coco/*.class
-    rmdir Coco
+    jar cfm Coco.jar src/Coco.manifest -C src Coco
+    rm -rf src/Coco/
 else
     echo
     echo "errors detected in compilation"
