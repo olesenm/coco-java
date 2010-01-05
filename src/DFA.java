@@ -46,11 +46,12 @@ import java.util.Iterator;
 //  State
 //-----------------------------------------------------------------------------
 
-class State {               // state of finite automaton
-  public int nr;            // state number
-  public Action firstAction;// to first action of this state
-  public Symbol endOf;      // recognized token if state is final
-  public boolean ctx;       // true if state is reached via contextTrans
+//! state of finite automaton
+class State {
+  public int nr;            //!< state number
+  public Action firstAction;//!< to first action of this state
+  public Symbol endOf;      //!< recognized token if state is final
+  public boolean ctx;       //!< true if state is reached via contextTrans
   public State next;
 
   public void AddAction(Action act) {
@@ -82,11 +83,12 @@ class State {               // state of finite automaton
 //  Action
 //-----------------------------------------------------------------------------
 
-class Action {                  // action of finite automaton
-  public int typ;               // type of action symbol: clas, chr
-  public int sym;               // action symbol
-  public int tc;                // transition code: normalTrans, contextTrans
-  public Target target;         // states reached from this action
+//! action of finite automaton
+class Action {
+  public int typ;               //!< type of action symbol: clas, chr
+  public int sym;               //!< action symbol
+  public int tc;                //!< transition code: normalTrans, contextTrans
+  public Target target;         //!< states reached from this action
   public Action next;
 
   public Action(int typ, int sym, int tc) {
@@ -138,8 +140,9 @@ class Action {                  // action of finite automaton
 //  Target
 //-----------------------------------------------------------------------------
 
-class Target {          // set of states that are reached by an action
-  public State state;   // target state
+//! set of states that are reached by an action
+class Target {
+  public State state;   //!< target state
   public Target next;
 
   public Target (State s) {
@@ -151,9 +154,10 @@ class Target {          // set of states that are reached by an action
 //  Melted
 //-----------------------------------------------------------------------------
 
-class Melted {          // info about melted states
-  public BitSet set;          // set of old states
-  public State state;         // new state
+//! info about melted states
+class Melted {
+  public BitSet set;          //!< set of old states
+  public State state;         //!< new state
   public Melted next;
 
   public Melted(BitSet set, State state) {
@@ -166,7 +170,8 @@ class Melted {          // info about melted states
 //  Comment
 //-----------------------------------------------------------------------------
 
-class Comment {         // info about comment syntax
+//! info about comment syntax
+class Comment {
   public String start;
   public String stop;
   public boolean nested;
@@ -294,24 +299,23 @@ class CharSet {
 //-----------------------------------------------------------------------------
 
 public class DFA {
-  public static final int EOF = -1;
+  static final int EOF = -1;
 
   public int maxStates;
-  public int lastStateNr;      // highest state number
+  public int lastStateNr;      //!< highest state number
   public State firstState;
-  public State lastState;      // last allocated state
-  public int lastSimState;     // last non melted state
-  public Reader fram;          // scanner frame input     /* pdt */
-  public PrintWriter gen;      // generated scanner file  /* pdt */
-  public Symbol curSy;         // current token to be recognized (in FindTrans)
-  public boolean ignoreCase;   // true if input should be treated case-insensitively
-  public boolean dirtyDFA;     // DFA may become nondeterministic in MatchLiteral
-  public boolean hasCtxMoves;  // DFA has context transitions
+  public State lastState;      //!< last allocated state
+  public int lastSimState;     //!< last non melted state
+  public Reader fram;          //!< scanner frame input     /* pdt */
+  public PrintWriter gen;      //!< generated scanner file  /* pdt */
+  public Symbol curSy;         //!< current token to be recognized (in FindTrans)
+  public boolean ignoreCase;   //!< true if input should be treated case-insensitively
+  public boolean dirtyDFA;     //!< DFA may become nondeterministic in MatchLiteral
+  public boolean hasCtxMoves;  //!< DFA has context transitions
 
   Parser parser;               // other Coco objects
   Tab tab;
   Errors errors;
-  Trace trace;
 
   private int framRead() {
     try {
@@ -636,6 +640,8 @@ public class DFA {
   }
 
   public void PrintStates() {
+    Trace trace = tab.trace;
+
     trace.WriteLine();
     trace.WriteLine("---------- states ----------");
     for (State state = firstState; state != null; state = state.next) {
@@ -815,7 +821,7 @@ public class DFA {
         char startCh = stop.charAt(0);
         int endOfStopString = stop.length()-1;
         int ch = framRead();
-        while (ch != EOF) {
+        while (ch != EOF) {    // not EOF
             if (ch == startCh) {
                 int i = 0;
                 do {
@@ -922,11 +928,11 @@ public class DFA {
     gen.println("\t\tstart.set(Buffer.EOF, -1);");
   }
 
-  void OpenGen(boolean backUp) {
+  void OpenGen() {
     try {
       File f = new File(tab.outDir, "Scanner.java");
-      if (backUp && f.exists()) {
-        File old = new File(f.getPath() + ".old");
+      if (tab.makeBackup && f.exists()) {
+        File old = new File(f.getPath() + ".bak");
         old.delete(); f.renameTo(old);
       }
       gen = new PrintWriter(new BufferedWriter(new FileWriter(f, false))); /* pdt */
@@ -950,7 +956,7 @@ public class DFA {
 
     if (dirtyDFA) MakeDeterministic();
 
-    OpenGen(true);
+    OpenGen();
     CopyFramePart("-->begin", tab.keepCopyright());
 
     /* add package name, if it exists */
@@ -960,7 +966,7 @@ public class DFA {
       gen.println(";");
     }
     CopyFramePart("-->declarations");
-    gen.println("\tstatic final int maxT = " + (tab.terminals.size() - 1) + ";");
+    gen.println("\tstatic final int maxT = " + (tab.terminals.size()-1) + ";");
     gen.println("\tstatic final int noSym = " + tab.noSym.n + ";");
     if (ignoreCase)
       gen.print("\tchar valCh;       // current input character (for token.val)");
@@ -1014,7 +1020,6 @@ public class DFA {
     this.parser = parser;
     tab = parser.tab;
     errors = parser.errors;
-    trace = parser.trace;
     firstState = null; lastState = null; lastStateNr = -1;
     firstState = NewState();
     firstMelted = null; firstComment = null;

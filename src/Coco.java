@@ -56,6 +56,7 @@ public class Coco {
 			"  -frames  <Dir>       for frames not in the source directory\n" +
 			"  -trace   <String>    trace with output to trace.txt\n" +
 			"  -o       <Dir>       output directory\n" +
+			"  -bak                 save existing Parser/Scanner files as .bak\n" +
 			"  -help                print this usage\n" +
 			"\nValid characters in the trace string:\n" +
 			"  A  trace automaton\n" +
@@ -74,11 +75,17 @@ public class Coco {
 	}
 
 	public static void main (String[] arg) {
-		System.out.println("Coco/R (04 Jan 2010)");
+		System.out.println("Coco/R Java (04 Jan 2010)");
 		String srcName = null, nsName = null, frameDir = null, ddtString = null, outDir = null;
+		boolean makeBackup = false;
 		int retVal = 1;
+
 		for (int i = 0; i < arg.length; i++) {
-			if (arg[i].compareTo("-package") == 0) {
+			if (arg[i].compareTo("-help") == 0) {
+				printUsage(null);
+				System.exit(0);
+			}
+			else if (arg[i].compareTo("-package") == 0) {
 				if (++i == arg.length) {
 					printUsage("missing parameter on -package");
 					System.exit(retVal);
@@ -106,13 +113,12 @@ public class Coco {
 				}
 				outDir = arg[i];
 			}
-			else if (arg[i].compareTo("-help") == 0) {
-				printUsage(null);
-				System.exit(0);
+			else if (arg[i].compareTo("-bak") == 0) {
+				makeBackup = true;
 			}
 			else if (arg[i].charAt(0) == '-') {
 				printUsage("Error: unknown option: '" + arg[i] + "'");
-				System.exit(0);
+				System.exit(retVal);
 			}
 			else if (srcName != null) {
 				printUsage("grammar can only be specified once");
@@ -128,23 +134,24 @@ public class Coco {
 				String srcDir = new File(srcName).getParent();
 
 				Scanner scanner = new Scanner(srcName);
-				Parser parser = new Parser(scanner);
+				Parser parser   = new Parser(scanner);
+				parser.tab      = new Tab(parser);
 
-				parser.trace = new Trace(srcDir);
-				parser.tab = new Tab(parser);
+				parser.tab.srcName  = srcName;
+				parser.tab.srcDir   = srcDir;
+				parser.tab.nsName   = nsName;
+				parser.tab.frameDir = frameDir;
+				parser.tab.outDir   = (outDir != null) ? outDir : srcDir;
+				parser.tab.SetDDT(ddtString);
+				parser.tab.makeBackup = makeBackup;
+
+				parser.tab.trace = new Trace(parser.tab.outDir);
 				parser.dfa = new DFA(parser);
 				parser.pgen = new ParserGen(parser);
 
-				parser.tab.srcName = srcName;
-				parser.tab.srcDir = srcDir;
-				parser.tab.nsName = nsName;
-				parser.tab.frameDir = frameDir;
-				parser.tab.outDir = (outDir != null) ? outDir : srcDir;
-				if (ddtString != null) parser.tab.SetDDT(ddtString);
-
 				parser.Parse();
 
-				parser.trace.Close();
+				parser.tab.trace.Close();
 				System.out.println(parser.errors.count + " errors detected");
 				if (parser.errors.count == 0) { retVal = 0; }
 			} catch (FatalError e) {

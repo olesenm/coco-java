@@ -43,30 +43,30 @@ import java.util.BitSet;
 
 public class ParserGen {
 
-  static final int maxTerm = 3;   // sets of size < maxTerm are enumerated
+  static final int maxTerm = 3;   //!< sets of size < maxTerm are enumerated
   static final char CR  = '\r';
   static final char LF  = '\n';
   static final int EOF = -1;
   static final String ls = System.getProperty("line.separator");
 
-  static final int tErr = 0;      // error codes
-  static final int altErr = 1;
+  static final int tErr    = 0;   //!< error codes
+  static final int altErr  = 1;
   static final int syncErr = 2;
 
-  public Position usingPos; // "using" definitions from the attributed grammar
+  public Position preamblePos;  //!< position of "import" definitions from attributed grammar
+  public Position semDeclPos;   //!< position of global semantic declarations
+  public Position initCodePos;  //!< position of initialization code
 
-  int errorNr;       // highest parser error number
-  Symbol curSy;      // symbol whose production is currently generated
-  Reader fram;       // parser frame file
-  PrintWriter gen;   // generated parser source file
-  StringWriter err;  // generated parser error messages
-  String srcName;    // name of attributed grammar file
-  String srcDir;     // directory of attributed grammar file
+  int errorNr;       //!< highest parser error number
+  Symbol curSy;      //!< symbol whose production is currently generated
+  Reader fram;       //!< parser frame file
+  PrintWriter gen;   //!< generated parser source file
+  StringWriter err;  //!< generated parser error messages
+  String srcName;    //!< name of attributed grammar file
+  String srcDir;     //!< directory of attributed grammar file
   ArrayList symSet = new ArrayList();
 
   Tab tab;           // other Coco objects
-  Trace trace;
-  //UNUSED Errors errors;
   Buffer buffer;
 
   private int framRead() {
@@ -116,7 +116,7 @@ public class ParserGen {
         char startCh = stop.charAt(0);
         int endOfStopString = stop.length()-1;
         int ch = framRead();
-        while (ch != EOF) {
+        while (ch != EOF) {    // not EOF
             if (ch == startCh) {
                 int i = 0;
                 do {
@@ -142,8 +142,8 @@ public class ParserGen {
 
   void CopySourcePart (Position pos, int indent) {
     // Copy text described by pos from atg to gen
-    int ch, i;
     if (pos != null) {
+      int ch, i;
       buffer.setPos(pos.beg); ch = buffer.Read();
       Indent(indent);
       Done: while (buffer.getPos() <= pos.end) {
@@ -400,11 +400,11 @@ public class ParserGen {
     }
   }
 
-  void OpenGen(boolean backUp) {
+  void OpenGen() {
     try {
       File f = new File(tab.outDir, "Parser.java");
-      if (backUp && f.exists()) {
-        File old = new File(f.getPath() + ".old");
+      if (tab.makeBackup && f.exists()) {
+        File old = new File(f.getPath() + ".bak");
         old.delete(); f.renameTo(old);
       }
       gen = new PrintWriter(new BufferedWriter(new FileWriter(f, false))); /* pdt */
@@ -434,7 +434,7 @@ public class ParserGen {
       GenErrorMsg(tErr, sym);
     }
 
-    OpenGen(true);
+    OpenGen();
     CopyFramePart("-->begin", tab.keepCopyright());
 
     if (tab.nsName != null && tab.nsName.length() > 0) {
@@ -442,17 +442,16 @@ public class ParserGen {
       gen.print(tab.nsName);
       gen.print(";");
     }
-    if (usingPos != null) {
+    if (preamblePos != null) {
       gen.println(); gen.println();
-      CopySourcePart(usingPos, 0);
+      CopySourcePart(preamblePos, 0);
     }
     CopyFramePart("-->constants");
     GenTokens();
     gen.println("\tpublic static final int maxT = " + (tab.terminals.size()-1) + ";");
     GenPragmas();
-    CopyFramePart("-->declarations"); CopySourcePart(tab.semDeclPos, 0);
-    CopyFramePart("-->constructor");
-    CopySourcePart(tab.initCodePos, 2);
+    CopyFramePart("-->declarations"); CopySourcePart(semDeclPos, 0);
+    CopyFramePart("-->constructor");  CopySourcePart(initCodePos, 2);
 
     CopyFramePart("-->pragmas"); GenCodePragmas();
     CopyFramePart("-->productions"); GenProductions();
@@ -470,22 +469,17 @@ public class ParserGen {
     buffer.setPos(oldPos);
   }
 
-  public void WriteStatistics () {
-    trace.WriteLine();
-    trace.WriteLine(tab.terminals.size() + " terminals");
-    trace.WriteLine(tab.terminals.size() + tab.pragmas.size() +
-                                   tab.nonterminals.size() + " symbols");
-    trace.WriteLine(tab.nodes.size() + " nodes");
-    trace.WriteLine(symSet.size() + " sets");
+  public void PrintStatistics () {
+    tab.trace.WriteLine(symSet.size() + " sets");
   }
 
   public ParserGen (Parser parser) {
     tab = parser.tab;
-    //UNUSED errors = parser.errors;
-    trace = parser.trace;
     buffer = parser.scanner.buffer;
     errorNr = -1;
-    usingPos = null;
+    preamblePos = null;
+    semDeclPos = null;
+    initCodePos = null;
   }
 
 }

@@ -38,19 +38,21 @@ import java.util.TreeMap;
 import java.util.Iterator;
 
 
-class Position { // position of source code stretch (e.g. semantic action, resolver expressions)
-	public int beg;      // start relative to the beginning of the file
-	public int end;      // end of stretch
-	public int col;      // column number of start position
+//! position of source code stretch (e.g. semantic action, resolver expressions)
+class Position {
+	public int beg;    //!< start relative to the beginning of the file
+	public int end;    //!< end of stretch
+	public int col;    //!< column number of start position
 
 	public Position(int beg, int end, int col) {
 		this.beg = beg; this.end = end; this.col = col;
 	}
 }
 
-class SymInfo { // output attribute of symbols in the ATG
+//! output attribute of symbols in the ATG
+class SymInfo {
 	String name;
-	int kind;		// 0 = ident, 1 = string
+	int kind;         //!< 0 = ident, 1 = string
 }
 
 //=====================================================================
@@ -58,29 +60,28 @@ class SymInfo { // output attribute of symbols in the ATG
 //=====================================================================
 
 class Symbol {
-
 	// token kinds
-	public static final int fixedToken    = 0; // e.g. 'a' ('b' | 'c') (structure of literals)
-	public static final int classToken    = 1; // e.g. digit {digit}   (at least one char class)
-	public static final int litToken      = 2; // e.g. "while"
-	public static final int classLitToken = 3; // e.g. letter {letter} but without literals that have the same structure
+	public static final int fixedToken    = 0; //!< e.g. 'a' ('b' | 'c') (structure of literals)
+	public static final int classToken    = 1; //!< e.g. digit {digit}   (at least one char class)
+	public static final int litToken      = 2; //!< e.g. "while"
+	public static final int classLitToken = 3; //!< e.g. letter {letter} but without literals that have the same structure
 
-	public int      n;           // symbol number
-	public int      typ;         // t, nt, pr, unknown, rslv /* ML 29_11_2002 slv added */ /* AW slv --> rslv */
-	public String   name;        // symbol name
-	public Node     graph;       // nt: to first node of syntax graph
-	public int      tokenKind;   // t:  token kind (fixedToken, classToken, ...)
-	public boolean  deletable;   // nt: true if nonterminal is deletable
-	public boolean  firstReady;  // nt: true if terminal start symbols have already been computed
-	public BitSet   first;       // nt: terminal start symbols
-	public BitSet   follow;      // nt: terminal followers
-	public BitSet   nts;         // nt: nonterminals whose followers have to be added to this sym
-	public int      line;        // source text line number of item in this node
-	public Position attrPos;     // nt: position of attributes in source text (or null)
-	public Position semPos;      // pr: pos of semantic action in source text (or null)
-															 // nt: pos of local declarations in source text (or null)
-	public String   retType;     // AH - nt: Type of output attribute (or null)
-	public String   retVar;      // AH - nt: Name of output attribute (or null)
+	public int      n;           //!< symbol number
+	public int      typ;         //!< t, nt, pr, unknown, rslv /* ML 29_11_2002 slv added */ /* AW slv --> rslv */
+	public String   name;        //!< symbol name
+	public Node     graph;       //!< nt: to first node of syntax graph
+	public int      tokenKind;   //!< t:  token kind (fixedToken, classToken, ...)
+	public boolean  deletable;   //!< nt: true if nonterminal is deletable
+	public boolean  firstReady;  //!< nt: true if terminal start symbols have already been computed
+	public BitSet   first;       //!< nt: terminal start symbols
+	public BitSet   follow;      //!< nt: terminal followers
+	public BitSet   nts;         //!< nt: nonterminals whose followers have to be added to this sym
+	public int      line;        //!< source text line number of item in this node
+	public Position attrPos;     //!< nt: position of attributes in source text (or null)
+	public Position semPos;      //!< pr: pos of semantic action in source text (or null)
+															 //!< nt: pos of local declarations in source text (or null)
+	public String   retType;     //!< nt: Type of output attribute (or null)
+	public String   retVar;      //!< nt: Name of output attribute (or null)
 
 	public Symbol(int typ, String name, int line) {
 		this.typ = typ; this.name = name; this.line = line;
@@ -94,41 +95,43 @@ class Symbol {
 
 class Node {
 	// constants for node kinds
-	public static final int t    =  1;  // terminal symbol
-	public static final int pr   =  2;  // pragma
-	public static final int nt   =  3;  // nonterminal symbol
-	public static final int clas =  4;  // character class
-	public static final int chr  =  5;  // character
-	public static final int wt   =  6;  // weak terminal symbol
+	public static final int t    =  1;  //!< terminal symbol
+	public static final int pr   =  2;  //!< pragma
+	public static final int nt   =  3;  //!< nonterminal symbol
+	public static final int clas =  4;  //!< character class
+	public static final int chr  =  5;  //!< character
+	public static final int wt   =  6;  //!< weak terminal symbol
 	public static final int any  =  7;  //
-	public static final int eps  =  8;  // empty
-	public static final int sync =  9;  // synchronization symbol
-	public static final int sem  = 10;  // semantic action: (. .)
-	public static final int alt  = 11;  // alternative: |
-	public static final int iter = 12;  // iteration: { }
-	public static final int opt  = 13;  // option: [ ]
-	public static final int rslv = 14;  // resolver expr  /* ML */ /* AW 03-01-13 renamed slv --> rslv */
+	public static final int eps  =  8;  //!< empty
+	public static final int sync =  9;  //!< synchronization symbol
+	public static final int sem  = 10;  //!< semantic action: (. .)
+	public static final int alt  = 11;  //!< alternative: |
+	public static final int iter = 12;  //!< iteration: { }
+	public static final int opt  = 13;  //!< option: [ ]
+	public static final int rslv = 14;  //!< resolver expr
 
-	public static final int normalTrans  = 0;		// transition codes
+	public static final int normalTrans  = 0;  //!< transition codes
 	public static final int contextTrans = 1;
 
-	public int      n;				// node number
-	public int      typ;			// t, nt, wt, chr, clas, any, eps, sem, sync, alt, iter, opt, rslv
-	public Node     next;			// to successor node
-	public Node     down;			// alt: to next alternative
-	public Node     sub;			// alt, iter, opt: to first node of substructure
-	public boolean  up;				// true: "next" leads to successor in enclosing structure
-	public Symbol   sym;			// nt, t, wt: symbol represented by this node
-	public int      val;			// chr:  ordinal character value
-														// clas: index of character class
-	public int      code;			// chr, clas: transition code
-	public BitSet set;				// any, sync: the set represented by this node
-	public Position pos;			// nt, t, wt: pos of actual attributes
-														// sem:       pos of semantic action in source text
-	public int      line;			// source text line number of item in this node
-	public State    state;		// DFA state corresponding to this node
-														// (only used in DFA.ConvertToStates)
-	public String retVar;			// AH 20040206 - nt: name of output attribute (or null)
+	public int      n;       //!< node number
+	public int      typ;     //!< t, nt, wt, chr, clas, any, eps, sem, sync, alt, iter, opt, rslv
+	public Symbol   sym;     //!< nt, t, wt: symbol represented by this node
+	public int      val;     //!< chr:  ordinal character value
+	                         //!< clas: index of character class
+	public int      code;    //!< chr, clas: transition code
+	public int      line;    //!< source text line number of item in this node
+
+	public BitSet   set;     //!< any, sync: the set represented by this node
+	public Position pos;     //!< nt, t, wt: pos of actual attributes
+	                         //!< sem: pos of semantic action in source text
+	public State    state;   //!< DFA state corresponding to this node
+	                         //!< (only used in DFA.ConvertToStates)
+	public String   retVar;  //!< nt: name of output attribute (or null)
+
+	public Node     next;    //!< to successor node
+	public Node     down;    //!< alt: to next alternative
+	public Node     sub;     //!< alt, iter, opt: to first node of substructure
+	public boolean  up;      //!< true: "next" leads to successor in enclosing structure
 
 	public Node(int typ, Symbol sym, int line) {
 		this.typ = typ; this.sym = sym; this.line = line;
@@ -141,8 +144,8 @@ class Node {
 //=====================================================================
 
 class Graph {
-	public Node l;	// left end of graph = head
-	public Node r;	// right end of graph = list of nodes to be linked to successor graph
+	public Node l;  //!< left end of graph = head
+	public Node r;  //!< right end of graph = list of nodes to be linked to successor graph
 
 	public Graph() {}
 
@@ -187,9 +190,9 @@ class Sets {
 //=====================================================================
 
 class CharClass {
-	public int n;       // class number
-	public String name;	// class name
-	public CharSet set;	// set representing the class
+	public int n;       //!< class number
+	public String name; //!< class name
+	public CharSet set; //!< set representing the class
 
 	public CharClass(String name, CharSet s) {
 		this.name = name; this.set = s;
@@ -200,36 +203,36 @@ class CharClass {
 // Tab
 //===========================================================
 
+//! Symbol Table Management
 public class Tab {
-	public Position semDeclPos;       // position of global semantic declarations
-	public Position initCodePos;      // position of initialization code
-	public CharSet ignored;           // characters ignored by the scanner
-	public boolean explicitEof;       // user must explicitly add EOF in grammar
-	public boolean[] ddt = new boolean[10]; // debug and test switches
-	public Symbol gramSy;             // root nonterminal; filled by ATG
-	public Symbol eofSy;              // end of file symbol
-	public Symbol noSym;              // used in case of an error
-	public BitSet allSyncSets;        // union of all synchronisation sets
-	public Hashtable literals;        // symbols that are used as literals
+	public boolean explicitEof = false; //!< user must explicitly add EOF in grammar
+	public boolean makeBackup  = false; //!< create .bak files for generated parser/scanner
+	public boolean[] ddt = new boolean[10]; //!< debug and test switches
 
-	public String grammarName;        // The name of the grammar, set by Coco-java.atg
+	public CharSet ignored;           //!< characters ignored by the scanner
+	public Symbol gramSy;             //!< root nonterminal; filled by ATG
+	public Symbol eofSy;              //!< end of file symbol
+	public Symbol noSym;              //!< used in case of an error
+	public BitSet allSyncSets;        //!< union of all synchronisation sets
+	public Hashtable literals;        //!< symbols that are used as literals
 
-	public String srcName;            // name of the atg file (including path)
-	public String srcDir;             // directory path of the atg file
-	public String nsName;             // package name for generated files
-	public String frameDir;           // directory containing the frame files
-	public String outDir;             // directory for generated files
+	public String grammarName;        //!< The name of the grammar, set by Coco-java.atg
 
-	BitSet visited;                   // mark list for graph traversals
-	Symbol curSy;                     // current symbol in computation of sets
+	public String srcName;            //!< name of the atg file (including path)
+	public String srcDir;             //!< directory path of the atg file
+	public String nsName;             //!< package name for generated files
+	public String frameDir;           //!< directory containing the frame files
+	public String outDir;             //!< directory for generated files
 
-	Parser parser;                    // other Coco objects
-	Trace trace;
+	BitSet visited;                   //!< mark list for graph traversals
+	Symbol curSy;                     //!< current symbol in computation of sets
+
+	Parser parser;                    //!< other Coco objects
 	Errors errors;
+	public Trace trace = null;
 
 	public Tab(Parser parser) {
 		this.parser = parser;
-		trace = parser.trace;
 		errors = parser.errors;
 		eofSy = NewSym(Node.t, "EOF", 0);
 		dummyNode = NewNode(Node.eps, null, 0);
@@ -1317,6 +1320,16 @@ public class Tab {
 		trace.WriteLine(); trace.WriteLine();
 	}
 
+	public void PrintStatistics () {
+		trace.WriteLine();
+		trace.WriteLine(terminals.size() + " terminals");
+		trace.WriteLine
+		(
+			terminals.size() + pragmas.size() + nonterminals.size() + " symbols"
+		);
+		trace.WriteLine(nodes.size() + " nodes");
+	}
+
 	public void DispatchDirective(String str) {
 		int len1 = str.indexOf('=');
 		int len2 = str.length() - len1 - 1;
@@ -1358,6 +1371,7 @@ public class Tab {
 	}
 
 	public void SetDDT (String s) {
+		if (s == null) return;
 		s = s.toUpperCase();
 		for (int i = 0; i < s.length(); i++) {
 			char ch = s.charAt(i);

@@ -52,14 +52,13 @@ public class Parser {
 static final int isIdent   = 0;
 	static final int isLiteral = 1;
 
-	public Trace trace;         // other Coco objects referenced by this ATG
-	public Tab tab;
+	public Tab tab;             // other Coco objects referenced by this ATG
 	public DFA dfa;
 	public ParserGen pgen;
 
 	boolean genScanner;
-	String tokenString;         // used in declarations of literal tokens
-	String noString = "-none-"; // used in declarations of literal tokens
+	String tokenString;         //!< used in declarations of literal tokens
+	String noString = "-none-"; //!< used in declarations of literal tokens
 
 /*-------------------------------------------------------------------------*/
 
@@ -139,7 +138,7 @@ static final int isIdent   = 0;
 			while (StartOf(1)) {
 				Get();
 			}
-			pgen.usingPos = new Position(beg, la.pos, 0); 
+			pgen.preamblePos = new Position(beg, la.pos, 0); 
 		}
 		Expect(6);
 		genScanner = true;
@@ -151,7 +150,7 @@ static final int isIdent   = 0;
 		while (StartOf(2)) {
 			Get();
 		}
-		tab.semDeclPos = new Position(beg, la.pos, 0); 
+		pgen.semDeclPos = new Position(beg, la.pos, 0); 
 		if (la.kind == 7) {
 			Get();
 			if (StartOf(3)) {
@@ -160,7 +159,7 @@ static final int isIdent   = 0;
 				while (StartOf(3)) {
 					Get();
 				}
-				tab.initCodePos = new Position(beg, la.pos, 0); 
+				pgen.initCodePos = new Position(beg, la.pos, 0); 
 			}
 		}
 		if (la.kind == 8) {
@@ -272,7 +271,8 @@ static final int isIdent   = 0;
 		    }
 		    System.out.println(" generated");
 		    if (tab.ddt[8]) {
-		      pgen.WriteStatistics();
+		      tab.PrintStatistics();
+		      pgen.PrintStatistics();
 		    }
 		  }
 		}
