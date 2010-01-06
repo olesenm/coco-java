@@ -75,7 +75,7 @@ public class Coco {
 	}
 
 	public static void main (String[] arg) {
-		System.out.println("Coco/R Java (04 Jan 2010)");
+		System.out.println("Coco/R Java (06 Jan 2010)");
 		String srcName = null, nsName = null, frameDir = null, ddtString = null, outDir = null;
 		boolean makeBackup = false;
 		int retVal = 1;

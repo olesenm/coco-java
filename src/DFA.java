@@ -942,6 +942,7 @@ public class DFA {
   }
 
   public void WriteScanner() {
+    int oldPos = tab.buffer.getPos();  // Buffer.pos is modified by CopySourcePart
     int i;
     File fr = new File(tab.srcDir, "Scanner.frame");
     if (!fr.exists()) {
@@ -957,7 +958,8 @@ public class DFA {
     if (dirtyDFA) MakeDeterministic();
 
     OpenGen();
-    CopyFramePart("-->begin", tab.keepCopyright());
+    CopyFramePart("-->begin", false);
+    tab.CopySourcePart(gen, tab.copyPos, 0);
 
     /* add package name, if it exists */
     if (tab.nsName != null && tab.nsName.length() > 0) {
@@ -1014,6 +1016,7 @@ public class DFA {
       WriteState(state);
     CopyFramePart("$$$");
     gen.close();
+    tab.buffer.setPos(oldPos);
   }
 
   public DFA (Parser parser) {

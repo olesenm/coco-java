@@ -37,6 +37,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Iterator;
 
+import java.io.PrintWriter;
+
 
 //! position of source code stretch (e.g. semantic action, resolver expressions)
 class Position {
@@ -205,9 +207,14 @@ class CharClass {
 
 //! Symbol Table Management
 public class Tab {
+	static final char CR  = '\r';
+	static final char LF  = '\n';
+
 	public boolean explicitEof = false; //!< user must explicitly add EOF in grammar
 	public boolean makeBackup  = false; //!< create .bak files for generated parser/scanner
 	public boolean[] ddt = new boolean[10]; //!< debug and test switches
+
+	public Position copyPos = null;   //!< position of verbatim copy (eg, copyright headers) in atg
 
 	public CharSet ignored;           //!< characters ignored by the scanner
 	public Symbol gramSy;             //!< root nonterminal; filled by ATG
@@ -215,8 +222,6 @@ public class Tab {
 	public Symbol noSym;              //!< used in case of an error
 	public BitSet allSyncSets;        //!< union of all synchronisation sets
 	public Hashtable literals;        //!< symbols that are used as literals
-
-	public String grammarName;        //!< The name of the grammar, set by Coco-java.atg
 
 	public String srcName;            //!< name of the atg file (including path)
 	public String srcDir;             //!< directory path of the atg file
@@ -229,13 +234,17 @@ public class Tab {
 
 	Parser parser;                    //!< other Coco objects
 	Errors errors;
+	Buffer buffer;
+
 	public Trace trace = null;
 
 	public Tab(Parser parser) {
 		this.parser = parser;
 		errors = parser.errors;
+		buffer = parser.scanner.buffer;
 		eofSy = NewSym(Node.t, "EOF", 0);
 		dummyNode = NewNode(Node.eps, null, 0);
+		ignored = new CharSet();
 		literals = new Hashtable();
 	}
 
@@ -1396,10 +1405,31 @@ public class Tab {
 		}
 	}
 
-	public boolean keepCopyright() {
-		return (grammarName.toLowerCase().compareTo("coco") == 0);
+	void CopySourcePart(PrintWriter dest, Position pos, int indent) {
+		// Copy text described by pos from atg to dest
+		if (pos != null) {
+			int ch, i;
+			buffer.setPos(pos.beg); ch = buffer.Read();
+			for (int t = 0; t < indent; ++t) dest.print('\t');
+			Done: while (buffer.getPos() <= pos.end) {
+				while (ch == CR || ch == LF) {  // eol is either CR or CRLF or LF
+					dest.println();
+					for (int t = 0; t < indent; ++t) dest.print('\t');
+					if (ch == CR) { ch = buffer.Read(); }  // skip CR
+					if (ch == LF) { ch = buffer.Read(); }  // skip LF
+					for (i = 1; i <= pos.col && ch <= ' '; i++) {
+						// skip blanks at beginning of line
+						ch = buffer.Read();
+					}
+					if (i <= pos.col) pos.col = i - 1; // heading TABs => not enough blanks
+					if (buffer.getPos() > pos.end) break Done;
+				}
+				dest.print((char)ch);
+				ch = buffer.Read();
+			}
+			if (indent > 0) dest.println();
+		}
 	}
-
 
 }
 

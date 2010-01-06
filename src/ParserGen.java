@@ -44,8 +44,6 @@ import java.util.BitSet;
 public class ParserGen {
 
   static final int maxTerm = 3;   //!< sets of size < maxTerm are enumerated
-  static final char CR  = '\r';
-  static final char LF  = '\n';
   static final int EOF = -1;
   static final String ls = System.getProperty("line.separator");
 
@@ -53,9 +51,9 @@ public class ParserGen {
   static final int altErr  = 1;
   static final int syncErr = 2;
 
-  public Position preamblePos;  //!< position of "import" definitions from attributed grammar
-  public Position semDeclPos;   //!< position of global semantic declarations
-  public Position initCodePos;  //!< position of initialization code
+  public Position preamblePos = null;  //!< position of "import" definitions from attributed grammar
+  public Position semDeclPos = null;   //!< position of global semantic declarations
+  public Position initCodePos = null;  //!< position of initialization code
 
   int errorNr;       //!< highest parser error number
   Symbol curSy;      //!< symbol whose production is currently generated
@@ -67,7 +65,6 @@ public class ParserGen {
   ArrayList symSet = new ArrayList();
 
   Tab tab;           // other Coco objects
-  Buffer buffer;
 
   private int framRead() {
     try {
@@ -140,29 +137,10 @@ public class ParserGen {
   }
 
 
-  void CopySourcePart (Position pos, int indent) {
+
+  void CopySourcePart(Position pos, int indent) {
     // Copy text described by pos from atg to gen
-    if (pos != null) {
-      int ch, i;
-      buffer.setPos(pos.beg); ch = buffer.Read();
-      Indent(indent);
-      Done: while (buffer.getPos() <= pos.end) {
-        while (ch == CR || ch == LF) {  // eol is either CR or CRLF or LF
-          gen.println(); Indent(indent);
-          if (ch == CR) { ch = buffer.Read(); }  // skip CR
-          if (ch == LF) { ch = buffer.Read(); }  // skip LF
-          for (i = 1; i <= pos.col && ch <= ' '; i++) {
-            // skip blanks at beginning of line
-            ch = buffer.Read();
-          }
-          if (i <= pos.col) pos.col = i - 1; // heading TABs => not enough blanks
-          if (buffer.getPos() > pos.end) break Done;
-        }
-        gen.print((char)ch);
-        ch = buffer.Read();
-      }
-      if (indent > 0) gen.println();
-    }
+    tab.CopySourcePart(gen, pos, indent);
   }
 
   void GenErrorMsg (int errTyp, Symbol sym) {
@@ -414,7 +392,8 @@ public class ParserGen {
   }
 
   public void WriteParser () {
-    int oldPos = buffer.getPos();  // Buffer.pos is modified by CopySourcePart
+    int oldPos = tab.buffer.getPos();  // Buffer.pos is modified by CopySourcePart
+
     symSet.add(tab.allSyncSets);
     File fr = new File(tab.srcDir, "Parser.frame");
     if (!fr.exists()) {
@@ -435,7 +414,8 @@ public class ParserGen {
     }
 
     OpenGen();
-    CopyFramePart("-->begin", tab.keepCopyright());
+    CopyFramePart("-->begin", false);
+    CopySourcePart(tab.copyPos, 0);
 
     if (tab.nsName != null && tab.nsName.length() > 0) {
       gen.print("package ");
@@ -466,7 +446,7 @@ public class ParserGen {
     CopyFramePart("-->errors"); gen.print(err.toString());
     CopyFramePart("$$$");
     gen.close();
-    buffer.setPos(oldPos);
+    tab.buffer.setPos(oldPos);
   }
 
   public void PrintStatistics () {
@@ -475,11 +455,7 @@ public class ParserGen {
 
   public ParserGen (Parser parser) {
     tab = parser.tab;
-    buffer = parser.scanner.buffer;
     errorNr = -1;
-    preamblePos = null;
-    semDeclPos = null;
-    initCodePos = null;
   }
 
 }
