@@ -225,7 +225,8 @@ public class Tab {
 
 	public String srcName;            //!< name of the atg file (including path)
 	public String srcDir;             //!< directory path of the atg file
-	public String nsName;             //!< package name for generated files
+	public String nsName = null;      //!< package name for generated files
+	public String prefixName = null;  //!< prefix for generated files
 	public String frameDir;           //!< directory containing the frame files
 	public String outDir;             //!< directory for generated files
 
@@ -1357,6 +1358,15 @@ public class Tab {
 				nsName = strval;
 			}
 			System.out.println("using package: '" + nsName + "'");
+		}
+		else if (name.compareTo("$prefix") == 0)
+		{
+			// set prefix only if not already set
+			if (prefixName == null)
+			{
+				prefixName = strval;
+			}
+			System.out.println("using prefix: '" + prefixName + "'");
 		}
 		else if (name.compareTo("$trace") == 0)
 		{

@@ -53,6 +53,7 @@ public class Coco {
 			"Usage: Coco Grammar.atg {Option}\n" +
 			"Options:\n" +
 			"  -package <Name>      eg, My.Package.Name\n" +
+			"  -prefix  <Name>      for unique Parser/Scanner file names\n" +
 			"  -frames  <Dir>       for frames not in the source directory\n" +
 			"  -trace   <String>    trace with output to trace.txt\n" +
 			"  -o       <Dir>       output directory\n" +
@@ -76,7 +77,8 @@ public class Coco {
 
 	public static void main (String[] arg) {
 		System.out.println("Coco/R Java (06 Jan 2010)");
-		String srcName = null, nsName = null, frameDir = null, ddtString = null, outDir = null;
+		String srcName = null, nsName = null, prefixName = null;
+		String frameDir = null, ddtString = null, outDir = null;
 		boolean makeBackup = false;
 		int retVal = 1;
 
@@ -91,6 +93,13 @@ public class Coco {
 					System.exit(retVal);
 				}
 				nsName = arg[i];
+			}
+			else if (arg[i].compareTo("-prefix") == 0) {
+				if (++i == arg.length) {
+					printUsage("missing parameter on -prefix");
+					System.exit(retVal);
+				}
+				prefixName = arg[i];
 			}
 			else if (arg[i].compareTo("-frames") == 0) {
 				if (++i == arg.length) {
@@ -137,9 +146,10 @@ public class Coco {
 				Parser parser   = new Parser(scanner);
 				parser.tab      = new Tab(parser);
 
-				parser.tab.srcName  = srcName;
-				parser.tab.srcDir   = srcDir;
-				parser.tab.nsName   = nsName;
+				parser.tab.srcName    = srcName;
+				parser.tab.srcDir     = srcDir;
+				parser.tab.nsName     = nsName;
+				parser.tab.prefixName = prefixName;
 				parser.tab.frameDir = frameDir;
 				parser.tab.outDir   = (outDir != null) ? outDir : srcDir;
 				parser.tab.SetDDT(ddtString);

@@ -380,7 +380,11 @@ public class ParserGen {
 
   void OpenGen() {
     try {
-      File f = new File(tab.outDir, "Parser.java");
+      File f = new File
+      (
+          tab.outDir,
+          (tab.prefixName == null ? "" : tab.prefixName) + "Parser.java";
+      );
       if (tab.makeBackup && f.exists()) {
         File old = new File(f.getPath() + ".bak");
         old.delete(); f.renameTo(old);
