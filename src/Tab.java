@@ -207,12 +207,27 @@ class CharClass {
 
 //! Symbol Table Management
 public class Tab {
+	// Constants
+
 	static final char CR  = '\r';
 	static final char LF  = '\n';
 
-	public boolean explicitEof = false; //!< user must explicitly add EOF in grammar
-	public boolean makeBackup  = false; //!< create .bak files for generated parser/scanner
-	public boolean[] ddt = new boolean[10]; //!< debug and test switches
+	// Static data members
+
+	static public boolean explicitEOF = false; //!< user must explicitly add EOF in grammar
+	static public boolean makeBackup  = false; //!< create .bak files for generated parser/scanner
+
+	static public String srcDir = null;     //!< directory path of the atg file
+	static public String frameDir = null;   //!< directory containing the frame files
+	static public String outDir = null;     //!< directory for generated files
+	static public String nsName = null;     //!< package name for generated files
+	static public String prefixName = null; //!< prefix for generated files
+
+	static public Trace trace = null;
+
+	static public boolean[] ddt = new boolean[10]; //!< debug and test switches
+
+	// Data members
 
 	public Position copyPos = null;   //!< position of verbatim copy (eg, copyright headers) in atg
 
@@ -223,21 +238,12 @@ public class Tab {
 	public BitSet allSyncSets;        //!< union of all synchronisation sets
 	public Hashtable literals;        //!< symbols that are used as literals
 
-	public String srcName;            //!< name of the atg file (including path)
-	public String srcDir;             //!< directory path of the atg file
-	public String nsName = null;      //!< package name for generated files
-	public String prefixName = null;  //!< prefix for generated files
-	public String frameDir;           //!< directory containing the frame files
-	public String outDir;             //!< directory for generated files
-
 	BitSet visited;                   //!< mark list for graph traversals
 	Symbol curSy;                     //!< current symbol in computation of sets
 
 	Parser parser;                    //!< other Coco objects
 	Errors errors;
 	Buffer buffer;
-
-	public Trace trace = null;
 
 	public Tab(Parser parser) {
 		this.parser = parser;
@@ -1375,9 +1381,9 @@ public class Tab {
 		else if (name.compareTo("$eof") == 0)
 		{
 			if (strval.compareTo("true") == 0) {
-				explicitEof = true;
+				explicitEOF = true;
 			} else if (strval.compareTo("false") == 0) {
-				explicitEof = false;
+				explicitEOF = false;
 			}
 			else {
 				System.out.println("ignoring unknown boolean value for pragma: '" + name + "' = '" + strval + "'");
@@ -1389,7 +1395,7 @@ public class Tab {
 		}
 	}
 
-	public void SetDDT (String s) {
+	static public void SetDDT (String s) {
 		if (s == null) return;
 		s = s.toUpperCase();
 		for (int i = 0; i < s.length(); i++) {
