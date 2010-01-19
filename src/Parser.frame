@@ -45,8 +45,6 @@ public class Parser {
 	public Parser(Scanner scanner) {
 		this.scanner = scanner;
 		errors = new Errors();
-		// user-defined initialization:
--->constructor
 	}
 
 	void SynErr (int n) {

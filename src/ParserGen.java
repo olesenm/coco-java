@@ -53,7 +53,6 @@ public class ParserGen {
 
   public Position preamblePos = null;  //!< position of "import" definitions from attributed grammar
   public Position semDeclPos = null;   //!< position of global semantic declarations
-  public Position initCodePos = null;  //!< position of initialization code
 
   int errorNr;       //!< highest parser error number
   Symbol curSy;      //!< symbol whose production is currently generated
@@ -435,7 +434,6 @@ public class ParserGen {
     gen.println("\tpublic static final int maxT = " + (tab.terminals.size()-1) + ";");
     GenPragmas();
     CopyFramePart("-->declarations"); CopySourcePart(semDeclPos, 0);
-    CopyFramePart("-->constructor");  CopySourcePart(initCodePos, 2);
 
     CopyFramePart("-->pragmas"); GenCodePragmas();
     CopyFramePart("-->productions"); GenProductions();
