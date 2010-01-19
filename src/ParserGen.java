@@ -60,6 +60,8 @@ public class ParserGen {
   Reader fram;       //!< parser frame file
   PrintWriter gen;   //!< generated parser source file
   StringWriter err;  //!< generated parser error messages
+  String srcName;    //!< name of attributed grammar file
+  String srcDir;     //!< directory of attributed grammar file
   ArrayList symSet = new ArrayList();
 
   Tab tab;           // other Coco objects
@@ -380,10 +382,10 @@ public class ParserGen {
     try {
       File f = new File
       (
-          Tab.outDir,
-          (Tab.prefixName == null ? "" : Tab.prefixName) + "Parser.java"
+          tab.outDir,
+          (tab.prefixName == null ? "" : tab.prefixName) + "Parser.java"
       );
-      if (Tab.makeBackup && f.exists()) {
+      if (tab.makeBackup && f.exists()) {
         File old = new File(f.getPath() + ".bak");
         old.delete(); f.renameTo(old);
       }
@@ -397,9 +399,9 @@ public class ParserGen {
     int oldPos = tab.buffer.getPos();  // Buffer.pos is modified by CopySourcePart
 
     symSet.add(tab.allSyncSets);
-    File fr = new File(Tab.srcDir, "Parser.frame");
+    File fr = new File(tab.srcDir, "Parser.frame");
     if (!fr.exists()) {
-      if (Tab.frameDir != null) fr = new File(Tab.frameDir.trim(), "Parser.frame");
+      if (tab.frameDir != null) fr = new File(tab.frameDir.trim(), "Parser.frame");
       if (!fr.exists()) throw new FatalError("Cannot find Parser.frame");
     }
     try {
@@ -419,9 +421,9 @@ public class ParserGen {
     CopyFramePart("-->begin", false);
     CopySourcePart(tab.copyPos, 0);
 
-    if (Tab.nsName != null && Tab.nsName.length() > 0) {
+    if (tab.nsName != null && tab.nsName.length() > 0) {
       gen.print("package ");
-      gen.print(Tab.nsName);
+      gen.print(tab.nsName);
       gen.print(";");
     }
     if (preamblePos != null) {
@@ -438,7 +440,7 @@ public class ParserGen {
     CopyFramePart("-->pragmas"); GenCodePragmas();
     CopyFramePart("-->productions"); GenProductions();
     CopyFramePart("-->parseRoot"); gen.println("\t\t" + tab.gramSy.name + "();");
-    if (Tab.explicitEOF) {
+    if (tab.explicitEOF) {
       gen.println("\t\t// let grammar deal with end-of-file expectations");
     }
     else {
@@ -452,7 +454,7 @@ public class ParserGen {
   }
 
   public void PrintStatistics () {
-    Tab.trace.WriteLine(symSet.size() + " sets");
+    tab.trace.WriteLine(symSet.size() + " sets");
   }
 
   public ParserGen (Parser parser) {

@@ -92,7 +92,7 @@ static final int isIdent   = 0;
 			}
 
 			if (la.kind == 51) {
-				Tab.SetDDT(la.val); 
+				tab.SetDDT(la.val); 
 			}
 			if (la.kind == 52) {
 				tab.DispatchDirective(la.val); 
@@ -277,27 +277,27 @@ static final int isIdent   = 0;
 		tab.noSym = tab.NewSym(Node.t, "???", 0); // noSym gets highest number
 		tab.SetupAnys();
 		tab.RenumberPragmas();
-		if (Tab.ddt[2]) tab.PrintNodes();
+		if (tab.ddt[2]) tab.PrintNodes();
 		if (errors.count == 0) {
 		  System.out.println("checking");
 		  tab.CompSymbolSets();
-		  if (Tab.ddt[7]) tab.XRef();
+		  if (tab.ddt[7]) tab.XRef();
 		  if (tab.GrammarOk()) {
 		    System.out.print("parser");
 		    pgen.WriteParser();
 		    if (genScanner) {
 		      System.out.print(" + scanner");
 		      dfa.WriteScanner();
-		      if (Tab.ddt[0]) dfa.PrintStates();
+		      if (tab.ddt[0]) dfa.PrintStates();
 		    }
 		    System.out.println(" generated");
-		    if (Tab.ddt[8]) {
+		    if (tab.ddt[8]) {
 		      tab.PrintStatistics();
 		      pgen.PrintStatistics();
 		    }
 		  }
 		}
-		if (Tab.ddt[6]) tab.PrintSymbolTable();
+		if (tab.ddt[6]) tab.PrintSymbolTable();
 		
 		Expect(24);
 	}

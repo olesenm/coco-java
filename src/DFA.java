@@ -640,7 +640,7 @@ public class DFA {
   }
 
   public void PrintStates() {
-    Trace trace = Tab.trace;
+    Trace trace = tab.trace;
 
     trace.WriteLine();
     trace.WriteLine("---------- states ----------");
@@ -932,10 +932,10 @@ public class DFA {
     try {
       File f = new File
       (
-          Tab.outDir,
-          (Tab.prefixName == null ? "" : Tab.prefixName) + "Scanner.java"
+          tab.outDir,
+          (tab.prefixName == null ? "" : tab.prefixName) + "Scanner.java"
       );
-      if (Tab.makeBackup && f.exists()) {
+      if (tab.makeBackup && f.exists()) {
         File old = new File(f.getPath() + ".bak");
         old.delete(); f.renameTo(old);
       }
@@ -948,9 +948,9 @@ public class DFA {
   public void WriteScanner() {
     int oldPos = tab.buffer.getPos();  // Buffer.pos is modified by CopySourcePart
     int i;
-    File fr = new File(Tab.srcDir, "Scanner.frame");
+    File fr = new File(tab.srcDir, "Scanner.frame");
     if (!fr.exists()) {
-      if (Tab.frameDir != null) fr = new File(Tab.frameDir.trim(), "Scanner.frame");
+      if (tab.frameDir != null) fr = new File(tab.frameDir.trim(), "Scanner.frame");
       if (!fr.exists()) throw new FatalError("Cannot find Scanner.frame");
     }
     try {
@@ -966,9 +966,9 @@ public class DFA {
     tab.CopySourcePart(gen, tab.copyPos, 0);
 
     /* add package name, if it exists */
-    if (Tab.nsName != null && Tab.nsName.length() > 0) {
+    if (tab.nsName != null && tab.nsName.length() > 0) {
       gen.print("package ");
-      gen.print(Tab.nsName);
+      gen.print(tab.nsName);
       gen.println(";");
     }
     CopyFramePart("-->declarations");
