@@ -131,12 +131,14 @@ class Errors {
 		errorStream.println(b.toString());
 	}
 
-	public void SynErr (int line, int col, int n) {
-		String s;
+	static public String strerror(int n) {
 		switch (n) {-->errors
-			default: s = "error " + n; break;
+			default: return "error " + n;
 		}
-		printMsg(line, col, s);
+	}
+
+	public void SynErr (int line, int col, int n) {
+		printMsg(line, col, strerror(n));
 		count++;
 	}
 

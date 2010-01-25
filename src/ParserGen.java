@@ -142,9 +142,9 @@ public class ParserGen {
     tab.CopySourcePart(gen, pos, indent);
   }
 
-  void GenErrorMsg (int errTyp, Symbol sym) {
+  void GenErrorMsg(int errTyp, Symbol sym) {
     errorNr++;
-    err.write(ls + "\t\t\tcase " + errorNr + ": s = \"");
+    err.write(ls + "\t\t\tcase " + errorNr + ": return \"");
     switch (errTyp) {
       case tErr:
         if (sym.name.charAt(0) == '"') err.write(tab.Escape(sym.name) + " expected");
@@ -153,7 +153,7 @@ public class ParserGen {
       case altErr: err.write("invalid " + sym.name); break;
       case syncErr: err.write("this symbol not expected in " + sym.name); break;
     }
-    err.write("\"; break;");
+    err.write("\";");
   }
 
   int NewCondSet (BitSet s) {

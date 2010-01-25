@@ -1,7 +1,9 @@
 /*-------------------------------------------------------------------------
  Coco-java.atg -- Attributed Grammar for Coco/R Java version
  compile with:
-   java -jar Coco.jar Coco-java.atg -package Coco
+   coco-java Coco-java.atg
+ or
+   java -jar Coco.jar Coco-java.atg
 -------------------------------------------------------------------------*/
 [copy]
 /*-------------------------------------------------------------------------
