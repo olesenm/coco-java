@@ -1,4 +1,3 @@
-
 /*---------------------------------------------------------------------------*\
     Compiler Generator Coco/R,
     Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
@@ -93,10 +92,10 @@ static final int isIdent   = 0;
 			}
 
 			if (la.kind == 47) {
-				tab.SetDDT(la.val); 
+				tab.SetDDT(la.val);
 			}
 			if (la.kind == 48) {
-				tab.DispatchDirective(la.val); 
+				tab.DispatchDirective(la.val);
 			}
 			la = t;
 		}
@@ -133,39 +132,39 @@ static final int isIdent   = 0;
 	}
 
 	void Coco() {
-		Symbol sym; Graph g; String grammarName; CharSet s; 
+		Symbol sym; Graph g; String grammarName; CharSet s;
 		if (la.kind == 6) {
 			Get();
-			int beg = t.pos + t.val.length(); 
+			int beg = t.pos + t.val.length();
 			while (StartOf(1)) {
 				Get();
 			}
-			tab.copyPos = new Position(beg, la.pos, 0); 
+			tab.copyPos = new Position(beg, la.pos, 0);
 			Expect(7);
 		}
 		if (StartOf(2)) {
 			Get();
-			int beg = t.pos; 
+			int beg = t.pos;
 			while (StartOf(3)) {
 				Get();
 			}
-			pgen.preamblePos = new Position(beg, la.pos, 0); 
+			pgen.preamblePos = new Position(beg, la.pos, 0);
 		}
 		Expect(8);
-		genScanner = true; 
+		genScanner = true;
 		Expect(1);
-		grammarName = t.val; 
+		grammarName = t.val;
 		if (StartOf(4)) {
 			Get();
-			int beg = t.pos; 
+			int beg = t.pos;
 			while (StartOf(4)) {
 				Get();
 			}
-			pgen.semDeclPos = new Position(beg, la.pos, 0); 
+			pgen.semDeclPos = new Position(beg, la.pos, 0);
 		}
 		if (la.kind == 9) {
 			Get();
-			dfa.ignoreCase = true; 
+			dfa.ignoreCase = true;
 		}
 		if (la.kind == 10) {
 			Get();
@@ -187,27 +186,27 @@ static final int isIdent   = 0;
 		}
 		while (la.kind == 13) {
 			Get();
-			Graph g1, g2; boolean nested = false; 
+			Graph g1, g2; boolean nested = false;
 			Expect(14);
 			g1 = TokenExpr();
 			Expect(15);
 			g2 = TokenExpr();
 			if (la.kind == 16) {
 				Get();
-				nested = true; 
+				nested = true;
 			}
-			dfa.NewComment(g1.l, g2.l, nested); 
+			dfa.NewComment(g1.l, g2.l, nested);
 		}
 		while (la.kind == 17) {
 			Get();
 			s = Set();
-			tab.ignored.Or(s); 
+			tab.ignored.Or(s);
 		}
 		while (!(la.kind == 0 || la.kind == 18)) {SynErr(47); Get();}
 		Expect(18);
 		if (genScanner) dfa.MakeDeterministic();
 		tab.DeleteNodes();
-		
+
 		while (la.kind == 1) {
 			Get();
 			sym = tab.FindSym(t.val);
@@ -224,7 +223,7 @@ static final int isIdent   = 0;
 			sym.attrPos = null;
 			boolean noRet = (sym.retVar == null);
 			sym.retVar = null;
-			
+
 			if (la.kind == 26 || la.kind == 31) {
 				AttrDecl(sym);
 			}
@@ -232,7 +231,7 @@ static final int isIdent   = 0;
 			   (noAttrs != (sym.attrPos == null)
 			   || noRet != (sym.retVar == null)))
 			   SemErr("attribute mismatch between declaration and use of this symbol");
-			
+
 			if (la.kind == 44) {
 				sym.semPos = SemText();
 			}
@@ -240,7 +239,7 @@ static final int isIdent   = 0;
 			g = Expression();
 			sym.graph = g.l;
 			tab.Finish(g);
-			
+
 			ExpectWeak(20, 6);
 		}
 		Expect(21);
@@ -279,27 +278,27 @@ static final int isIdent   = 0;
 		  }
 		}
 		if (tab.ddt[6]) tab.PrintSymbolTable();
-		
+
 		Expect(20);
 	}
 
 	void SetDecl() {
-		CharSet s; 
+		CharSet s;
 		Expect(1);
 		String name = t.val;
 		CharClass c = tab.FindCharClass(name);
 		if (c != null) SemErr("name declared twice");
-		
+
 		Expect(19);
 		s = Set();
 		if (s.Elements() == 0) SemErr("character set must not be empty");
 		c = tab.NewCharClass(name, s);
-		
+
 		Expect(20);
 	}
 
 	void TokenDecl(int typ) {
-		SymInfo s; Symbol sym; Graph g; 
+		SymInfo s; Symbol sym; Graph g;
 		s = Sym();
 		sym = tab.FindSym(s.name);
 		if (sym != null) SemErr("name declared twice");
@@ -308,7 +307,7 @@ static final int isIdent   = 0;
 		  sym.tokenKind = Symbol.fixedToken;
 		}
 		tokenString = null;
-		
+
 		while (!(StartOf(7))) {SynErr(48); Get();}
 		if (la.kind == 19) {
 			Get();
@@ -324,52 +323,52 @@ static final int isIdent   = 0;
 			  tab.literals.put(tokenString, sym);
 			  dfa.MatchLiteral(tokenString, sym);
 			}
-			
+
 		} else if (StartOf(8)) {
 			if (s.kind == isIdent) genScanner = false;
 			else dfa.MatchLiteral(sym.name, sym);
-			
+
 		} else SynErr(49);
 		if (la.kind == 44) {
 			sym.semPos = SemText();
-			if (typ != Node.pr) SemErr("semantic action not allowed here"); 
+			if (typ != Node.pr) SemErr("semantic action not allowed here");
 		}
 	}
 
 	Graph  TokenExpr() {
 		Graph  g;
-		Graph g2; 
+		Graph g2;
 		g = TokenTerm();
-		boolean first = true; 
+		boolean first = true;
 		while (WeakSeparator(35,9,10) ) {
 			g2 = TokenTerm();
 			if (first) { tab.MakeFirstAlt(g); first = false; }
 			tab.MakeAlternative(g, g2);
-			
+
 		}
 		return g;
 	}
 
 	CharSet  Set() {
 		CharSet  s;
-		CharSet s2; 
+		CharSet s2;
 		s = SimSet();
 		while (la.kind == 22 || la.kind == 23) {
 			if (la.kind == 22) {
 				Get();
 				s2 = SimSet();
-				s.Or(s2); 
+				s.Or(s2);
 			} else {
 				Get();
 				s2 = SimSet();
-				s.Subtract(s2); 
+				s.Subtract(s2);
 			}
 		}
 		return s;
 	}
 
 	void AttrDecl(Symbol sym) {
-		int beg, col; 
+		int beg, col;
 		if (la.kind == 26) {
 			Get();
 			if (la.kind == 27 || la.kind == 28) {
@@ -378,41 +377,41 @@ static final int isIdent   = 0;
 				} else {
 					Get();
 				}
-				beg = la.pos; 
+				beg = la.pos;
 				TypeName();
-				sym.retType = scanner.buffer.GetString(beg, la.pos); 
+				sym.retType = scanner.buffer.GetString(beg, la.pos);
 				Expect(1);
-				sym.retVar = t.val; 
+				sym.retVar = t.val;
 				if (la.kind == 29) {
 					Get();
 				} else if (la.kind == 30) {
 					Get();
-					beg = la.pos; col = la.col; 
+					beg = la.pos; col = la.col;
 					while (StartOf(11)) {
 						if (StartOf(12)) {
 							Get();
 						} else {
 							Get();
-							SemErr("bad string in attributes"); 
+							SemErr("bad string in attributes");
 						}
 					}
 					Expect(29);
 					if (t.pos > beg)
-					 sym.attrPos = new Position(beg, t.pos, col); 
+					 sym.attrPos = new Position(beg, t.pos, col);
 				} else SynErr(50);
 			} else if (StartOf(13)) {
-				beg = la.pos; col = la.col; 
+				beg = la.pos; col = la.col;
 				while (StartOf(14)) {
 					if (StartOf(15)) {
 						Get();
 					} else {
 						Get();
-						SemErr("bad string in attributes"); 
+						SemErr("bad string in attributes");
 					}
 				}
 				Expect(29);
 				if (t.pos > beg)
-				 sym.attrPos = new Position(beg, t.pos, col); 
+				 sym.attrPos = new Position(beg, t.pos, col);
 			} else SynErr(51);
 		} else if (la.kind == 31) {
 			Get();
@@ -422,41 +421,41 @@ static final int isIdent   = 0;
 				} else {
 					Get();
 				}
-				beg = la.pos; 
+				beg = la.pos;
 				TypeName();
-				sym.retType = scanner.buffer.GetString(beg, la.pos); 
+				sym.retType = scanner.buffer.GetString(beg, la.pos);
 				Expect(1);
-				sym.retVar = t.val; 
+				sym.retVar = t.val;
 				if (la.kind == 32) {
 					Get();
 				} else if (la.kind == 30) {
 					Get();
-					beg = la.pos; col = la.col; 
+					beg = la.pos; col = la.col;
 					while (StartOf(16)) {
 						if (StartOf(17)) {
 							Get();
 						} else {
 							Get();
-							SemErr("bad string in attributes"); 
+							SemErr("bad string in attributes");
 						}
 					}
 					Expect(32);
 					if (t.pos > beg)
-					 sym.attrPos = new Position(beg, t.pos, col); 
+					 sym.attrPos = new Position(beg, t.pos, col);
 				} else SynErr(52);
 			} else if (StartOf(13)) {
-				beg = la.pos; col = la.col; 
+				beg = la.pos; col = la.col;
 				while (StartOf(18)) {
 					if (StartOf(19)) {
 						Get();
 					} else {
 						Get();
-						SemErr("bad string in attributes"); 
+						SemErr("bad string in attributes");
 					}
 				}
 				Expect(32);
 				if (t.pos > beg)
-				 sym.attrPos = new Position(beg, t.pos, col); 
+				 sym.attrPos = new Position(beg, t.pos, col);
 			} else SynErr(53);
 		} else SynErr(54);
 	}
@@ -464,64 +463,64 @@ static final int isIdent   = 0;
 	Position  SemText() {
 		Position  pos;
 		Expect(44);
-		int beg = la.pos; int col = la.col; 
+		int beg = la.pos; int col = la.col;
 		while (StartOf(20)) {
 			if (StartOf(21)) {
 				Get();
 			} else if (la.kind == 4) {
 				Get();
-				SemErr("bad string in semantic action"); 
+				SemErr("bad string in semantic action");
 			} else {
 				Get();
-				SemErr("missing end of previous semantic action"); 
+				SemErr("missing end of previous semantic action");
 			}
 		}
 		Expect(45);
-		pos = new Position(beg, t.pos, col); 
+		pos = new Position(beg, t.pos, col);
 		return pos;
 	}
 
 	Graph  Expression() {
 		Graph  g;
-		Graph g2; 
+		Graph g2;
 		g = Term();
-		boolean first = true; 
+		boolean first = true;
 		while (WeakSeparator(35,22,23) ) {
 			g2 = Term();
 			if (first) { tab.MakeFirstAlt(g); first = false; }
 			tab.MakeAlternative(g, g2);
-			
+
 		}
 		return g;
 	}
 
 	CharSet  SimSet() {
 		CharSet  s;
-		int n1, n2; 
-		s = new CharSet(); 
+		int n1, n2;
+		s = new CharSet();
 		if (la.kind == 1) {
 			Get();
 			CharClass c = tab.FindCharClass(t.val);
 			if (c == null) SemErr("undefined name"); else s.Or(c.set);
-			
+
 		} else if (la.kind == 3) {
 			Get();
 			String name = t.val;
 			name = tab.Unescape(name.substring(1, name.length()-1));
 			for (int i = 0; i < name.length(); i++)
 			  if (dfa.ignoreCase) s.Set(Character.toLowerCase(name.charAt(i)));
-			  else s.Set(name.charAt(i)); 
+			  else s.Set(name.charAt(i));
 		} else if (la.kind == 5) {
 			n1 = Char();
-			s.Set(n1); 
+			s.Set(n1);
 			if (la.kind == 24) {
 				Get();
 				n2 = Char();
-				for (int i = n1; i <= n2; i++) s.Set(i); 
+				for (int i = n1; i <= n2; i++) s.Set(i);
 			}
 		} else if (la.kind == 25) {
 			Get();
-			s = new CharSet(); s.Fill(); 
+			s = new CharSet(); s.Fill();
 		} else SynErr(55);
 		return s;
 	}
@@ -534,28 +533,28 @@ static final int isIdent   = 0;
 		if (name.length() == 1) n = name.charAt(0);
 		else SemErr("unacceptable character value");
 		if (dfa.ignoreCase && (char)n >= 'A' && (char)n <= 'Z') n += 32;
-		
+
 		return n;
 	}
 
 	SymInfo  Sym() {
 		SymInfo  s;
-		s = new SymInfo(); s.name = "???"; s.kind = isIdent; 
+		s = new SymInfo(); s.name = "???"; s.kind = isIdent;
 		if (la.kind == 1) {
 			Get();
-			s.kind = isIdent; s.name = t.val; 
+			s.kind = isIdent; s.name = t.val;
 		} else if (la.kind == 3 || la.kind == 5) {
 			if (la.kind == 3) {
 				Get();
-				s.name = t.val; 
+				s.name = t.val;
 			} else {
 				Get();
-				s.name = "\"" + t.val.substring(1, t.val.length()-1) + "\""; 
+				s.name = "\"" + t.val.substring(1, t.val.length()-1) + "\"";
 			}
 			s.kind = isLiteral;
 			if (dfa.ignoreCase) s.name = s.name.toLowerCase();
 			if (s.name.indexOf(' ') >= 0)
-			  SemErr("literal tokens must not contain blanks"); 
+			  SemErr("literal tokens must not contain blanks");
 		} else SynErr(56);
 		return s;
 	}
@@ -583,27 +582,27 @@ static final int isIdent   = 0;
 
 	Graph  Term() {
 		Graph  g;
-		Graph g2; Node rslv = null; g = null; 
+		Graph g2; Node rslv = null; g = null;
 		if (StartOf(24)) {
 			if (la.kind == 42) {
-				rslv = tab.NewNode(Node.rslv, null, la.line); 
+				rslv = tab.NewNode(Node.rslv, null, la.line);
 				rslv.pos = Resolver();
-				g = new Graph(rslv);                       
+				g = new Graph(rslv);                      
 			}
 			g2 = Factor();
 			if (rslv != null) tab.MakeSequence(g, g2);
 			else g = g2;
-			
+
 			while (StartOf(25)) {
 				g2 = Factor();
-				tab.MakeSequence(g, g2); 
+				tab.MakeSequence(g, g2);
 			}
 		} else if (StartOf(26)) {
-			g = new Graph(tab.NewNode(Node.eps, null, 0)); 
+			g = new Graph(tab.NewNode(Node.eps, null, 0));
 		} else SynErr(57);
 		if (g == null) // invalid start of Term
 		 g = new Graph(tab.NewNode(Node.eps, null, 0));
-		
+
 		return g;
 	}
 
@@ -611,21 +610,21 @@ static final int isIdent   = 0;
 		Position  pos;
 		Expect(42);
 		Expect(37);
-		int beg = la.pos; int col = la.col; 
+		int beg = la.pos; int col = la.col;
 		Condition();
-		pos = new Position(beg, t.pos, col); 
+		pos = new Position(beg, t.pos, col);
 		return pos;
 	}
 
 	Graph  Factor() {
 		Graph  g;
 		SymInfo s; Position pos; boolean weak = false;
-		g = null; 
+		g = null;
 		switch (la.kind) {
 		case 1: case 3: case 5: case 36: {
 			if (la.kind == 36) {
 				Get();
-				weak = true; 
+				weak = true;
 			}
 			s = Sym();
 			Symbol sym = tab.FindSym(s.name);
@@ -651,10 +650,10 @@ static final int isIdent   = 0;
 			  else SemErr("only terminals may be weak");
 			Node p = tab.NewNode(typ, sym, t.line);
 			g = new Graph(p);
-			
+
 			if (la.kind == 26 || la.kind == 31) {
 				Attribs(p);
-				if (s.kind == isLiteral) SemErr("a literal must not have attributes"); 
+				if (s.kind == isLiteral) SemErr("a literal must not have attributes");
 			}
 			if (undef) {
 			 sym.attrPos = p.pos;  // dummy
@@ -662,7 +661,7 @@ static final int isIdent   = 0;
 			} else if ((p.pos == null) != (sym.attrPos == null)
 			       || (p.retVar == null) != (sym.retVar == null))
 			  SemErr("attribute mismatch between declaration and use of this symbol");
-			
+
 			break;
 		}
 		case 37: {
@@ -675,14 +674,14 @@ static final int isIdent   = 0;
 			Get();
 			g = Expression();
 			Expect(34);
-			tab.MakeOption(g); 
+			tab.MakeOption(g);
 			break;
 		}
 		case 39: {
 			Get();
 			g = Expression();
 			Expect(40);
-			tab.MakeIteration(g); 
+			tab.MakeIteration(g);
 			break;
 		}
 		case 44: {
@@ -690,33 +689,33 @@ static final int isIdent   = 0;
 			Node p = tab.NewNode(Node.sem, null, 0);
 			p.pos = pos;
 			g = new Graph(p);
-			
+
 			break;
 		}
 		case 25: {
 			Get();
 			Node p = tab.NewNode(Node.any, null, 0);  // p.set is set in tab.SetupAnys
 			g = new Graph(p);
-			
+
 			break;
 		}
 		case 41: {
 			Get();
 			Node p = tab.NewNode(Node.sync, null, 0);
 			g = new Graph(p);
-			
+
 			break;
 		}
 		default: SynErr(58); break;
 		}
 		if (g == null) // invalid start of Factor
 		 g = new Graph(tab.NewNode(Node.eps, null, 0));
-		
+
 		return g;
 	}
 
 	void Attribs(Node n) {
-		int beg, col; 
+		int beg, col;
 		if (la.kind == 26) {
 			Get();
 			if (la.kind == 27 || la.kind == 28) {
@@ -725,7 +724,7 @@ static final int isIdent   = 0;
 				} else {
 					Get();
 				}
-				beg = la.pos; 
+				beg = la.pos;
 				while (StartOf(27)) {
 					if (StartOf(28)) {
 						Get();
@@ -733,38 +732,38 @@ static final int isIdent   = 0;
 						Bracketed();
 					} else {
 						Get();
-						SemErr("bad string in attributes"); 
+						SemErr("bad string in attributes");
 					}
 				}
-				n.retVar = scanner.buffer.GetString(beg, la.pos); 
+				n.retVar = scanner.buffer.GetString(beg, la.pos);
 				if (la.kind == 29) {
 					Get();
 				} else if (la.kind == 30) {
 					Get();
-					beg = la.pos; col = la.col; 
+					beg = la.pos; col = la.col;
 					while (StartOf(11)) {
 						if (StartOf(12)) {
 							Get();
 						} else {
 							Get();
-							SemErr("bad string in attributes"); 
+							SemErr("bad string in attributes");
 						}
 					}
 					Expect(29);
-					if (t.pos > beg) n.pos = new Position(beg, t.pos, col); 
+					if (t.pos > beg) n.pos = new Position(beg, t.pos, col);
 				} else SynErr(59);
 			} else if (StartOf(13)) {
-				beg = la.pos; col = la.col; 
+				beg = la.pos; col = la.col;
 				while (StartOf(14)) {
 					if (StartOf(15)) {
 						Get();
 					} else {
 						Get();
-						SemErr("bad string in attributes"); 
+						SemErr("bad string in attributes");
 					}
 				}
 				Expect(29);
-				if (t.pos > beg) n.pos = new Position(beg, t.pos, col); 
+				if (t.pos > beg) n.pos = new Position(beg, t.pos, col);
 			} else SynErr(60);
 		} else if (la.kind == 31) {
 			Get();
@@ -774,7 +773,7 @@ static final int isIdent   = 0;
 				} else {
 					Get();
 				}
-				beg = la.pos; 
+				beg = la.pos;
 				while (StartOf(29)) {
 					if (StartOf(30)) {
 						Get();
@@ -782,38 +781,38 @@ static final int isIdent   = 0;
 						Bracketed();
 					} else {
 						Get();
-						SemErr("bad string in attributes"); 
+						SemErr("bad string in attributes");
 					}
 				}
-				n.retVar = scanner.buffer.GetString(beg, la.pos); 
+				n.retVar = scanner.buffer.GetString(beg, la.pos);
 				if (la.kind == 32) {
 					Get();
 				} else if (la.kind == 30) {
 					Get();
-					beg = la.pos; col = la.col; 
+					beg = la.pos; col = la.col;
 					while (StartOf(16)) {
 						if (StartOf(17)) {
 							Get();
 						} else {
 							Get();
-							SemErr("bad string in attributes"); 
+							SemErr("bad string in attributes");
 						}
 					}
 					Expect(32);
-					if (t.pos > beg) n.pos = new Position(beg, t.pos, col); 
+					if (t.pos > beg) n.pos = new Position(beg, t.pos, col);
 				} else SynErr(61);
 			} else if (StartOf(13)) {
-				beg = la.pos; col = la.col; 
+				beg = la.pos; col = la.col;
 				while (StartOf(18)) {
 					if (StartOf(19)) {
 						Get();
 					} else {
 						Get();
-						SemErr("bad string in attributes"); 
+						SemErr("bad string in attributes");
 					}
 				}
 				Expect(32);
-				if (t.pos > beg) n.pos = new Position(beg, t.pos, col); 
+				if (t.pos > beg) n.pos = new Position(beg, t.pos, col);
 			} else SynErr(62);
 		} else SynErr(63);
 	}
@@ -832,18 +831,18 @@ static final int isIdent   = 0;
 
 	Graph  TokenTerm() {
 		Graph  g;
-		Graph g2; 
+		Graph g2;
 		g = TokenFactor();
 		while (StartOf(9)) {
 			g2 = TokenFactor();
-			tab.MakeSequence(g, g2); 
+			tab.MakeSequence(g, g2);
 		}
 		if (la.kind == 43) {
 			Get();
 			Expect(37);
 			g2 = TokenExpr();
 			tab.SetContextTrans(g2.l); dfa.hasCtxMoves = true;
-			tab.MakeSequence(g, g2); 
+			tab.MakeSequence(g, g2);
 			Expect(38);
 		}
 		return g;
@@ -851,7 +850,7 @@ static final int isIdent   = 0;
 
 	Graph  TokenFactor() {
 		Graph  g;
-		SymInfo s; g = null; 
+		SymInfo s; g = null;
 		if (la.kind == 1 || la.kind == 3 || la.kind == 5) {
 			s = Sym();
 			if (s.kind == isIdent) {
@@ -868,7 +867,7 @@ static final int isIdent   = 0;
 			  if (tokenString == null) tokenString = s.name;
 			  else tokenString = noString;
 			}
-			
+
 		} else if (la.kind == 37) {
 			Get();
 			g = TokenExpr();
@@ -877,15 +876,15 @@ static final int isIdent   = 0;
 			Get();
 			g = TokenExpr();
 			Expect(34);
-			tab.MakeOption(g); tokenString = noString; 
+			tab.MakeOption(g); tokenString = noString;
 		} else if (la.kind == 39) {
 			Get();
 			g = TokenExpr();
 			Expect(40);
-			tab.MakeIteration(g); tokenString = noString; 
+			tab.MakeIteration(g); tokenString = noString;
 		} else SynErr(64);
 		if (g == null) // invalid start of TokenFactor
-		 g = new Graph(tab.NewNode(Node.eps, null, 0)); 
+		 g = new Graph(tab.NewNode(Node.eps, null, 0));
 		return g;
 	}
 

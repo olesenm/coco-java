@@ -1,4 +1,3 @@
-
 /*---------------------------------------------------------------------------*\
     Compiler Generator Coco/R,
     Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
