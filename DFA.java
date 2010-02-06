@@ -424,12 +424,21 @@ public class DFA {
         Step(from, p.sub, stepped); Step(from, p.down, stepped);
         break;
       }
-      case Node.iter: case Node.opt: {
+      case Node.iter: {
+        if (tab.DelSubGraph(p.sub)) {
+          parser.SemErr("contents of {...} must not be deletable");
+          return;
+        }
         if (p.next != null && !stepped.get(p.next.n)) Step(from, p.next, stepped);
         Step(from, p.sub, stepped);
-        if (p.typ == Node.iter && p.state != from) {
+        if (p.state != from) {
           Step(p.state, p, new BitSet(tab.nodes.size()));
         }
+        break;
+      }
+      case Node.opt: {
+        if (p.next != null && !stepped.get(p.next.n)) Step(from, p.next, stepped);
+        Step(from, p.sub, stepped);
         break;
       }
     }
@@ -499,7 +508,10 @@ public class DFA {
 
   public void ConvertToStates(Node p, Symbol sym) {
     curSy = sym;
-    if (tab.DelGraph(p)) parser.SemErr("token might be empty");
+    if (tab.DelGraph(p)) {
+      parser.SemErr("token might be empty");
+      return;
+    }
     NumberNodes(p, firstState, true);
     FindTrans(p, true, new BitSet(tab.nodes.size()));
     if (p.typ == Node.iter) {
@@ -861,6 +873,9 @@ public class DFA {
   void WriteState(State state) {
     Symbol endOf = state.endOf;
     gen.println("\t\t\t\tcase " + state.nr + ":");
+    if (endOf != null && state.firstAction != null) {
+      gen.println("\t\t\t\t\trecEnd = pos; recKind = " + endOf.n + ";");
+    }
     boolean ctxEnd = state.ctx;
     for (Action action = state.firstAction; action != null; action = action.next) {
       if (action == state.firstAction) gen.print("\t\t\t\t\tif (");
@@ -882,12 +897,11 @@ public class DFA {
     if (ctxEnd) { // final context state: cut appendix
       gen.println();
       gen.println("\t\t\t\t\ttlen -= apx;");
-      gen.println("\t\t\t\t\tbuffer.setPos(t.pos); NextCh(); line = t.line; col = t.col; ");
-      gen.println("\t\t\t\t\tfor (int i = 0; i < tlen; i++) NextCh();");
+      gen.println("\t\t\t\t\tSetScannerBehindT();");
       gen.print  ("\t\t\t\t\t");
     }
     if (endOf == null) {
-      gen.println("t.kind = noSym; break loop;}");
+      gen.println("state = 0; break;}");
     } else {
       gen.print("t.kind = " + endOf.n + "; ");
       if (endOf.tokenKind == Symbol.classLitToken) {

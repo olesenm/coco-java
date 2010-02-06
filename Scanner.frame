@@ -368,6 +368,8 @@ public class Scanner {
 -->scan1
 		) NextCh();
 -->scan2
+		int recKind = noSym;
+		int recEnd = pos;
 		t = new Token();
 		t.pos = pos; t.col = col; t.line = line; 
 		int state = start.state(ch);
@@ -376,14 +378,27 @@ public class Scanner {
 		loop: for (;;) {
 			switch (state) {
 				case -1: { t.kind = eofSym; break loop; } // NextCh already done 
-				case 0: { t.kind = noSym; break loop; }   // NextCh already done
+				case 0: {
+					if (recKind != noSym) {
+						tlen = recEnd - t.pos;
+						SetScannerBehindT();
+					}
+					t.kind = recKind; break loop;
+				} // NextCh already done
 -->scan3
 			}
 		}
 		t.val = new String(tval, 0, tlen);
 		return t;
 	}
-	
+
+	private void SetScannerBehindT() {
+		buffer.setPos(t.pos);
+		NextCh();
+		line = t.line; col = t.col;
+		for (int i = 0; i < tlen; i++) NextCh();
+	}
+
 	// get the next token (possibly a token already seen during peeking)
 	public Token Scan () {
 		if (tokens.next == null) {

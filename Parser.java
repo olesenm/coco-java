@@ -857,12 +857,12 @@ public class Parser {
 			Get();
 			g = TokenExpr();
 			Expect(32);
-			tab.MakeOption(g); 
+			tab.MakeOption(g); tokenString = noString; 
 		} else if (la.kind == 37) {
 			Get();
 			g = TokenExpr();
 			Expect(38);
-			tab.MakeIteration(g); 
+			tab.MakeIteration(g); tokenString = noString; 
 		} else SynErr(62);
 		if (g == null) // invalid start of TokenFactor
 		 g = new Graph(tab.NewNode(Node.eps, null, 0)); 

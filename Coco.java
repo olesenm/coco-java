@@ -48,7 +48,7 @@ import java.io.File;
 public class Coco {
 
 	public static void main (String[] arg) {
-		System.out.println("Coco/R (Jun 22, 2009)");
+		System.out.println("Coco/R (Jan 11, 2010)");
 		String srcName = null, nsName = null, frameDir = null, ddtString = null, outDir = null;
 		int retVal = 1;
 		for (int i = 0; i < arg.length; i++) {
