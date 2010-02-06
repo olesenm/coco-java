@@ -1344,46 +1344,39 @@ public class Tab {
 	}
 
 	public void DispatchDirective(String str) {
-		int len1 = str.indexOf('=');
-		int len2 = str.length() - len1 - 1;
-
-		if (len1 < 0 || len2 < 1)
+		int fndEqual = str.indexOf('=');
+		if (fndEqual < 0)
 		{
 			return;
 		}
-		String name = str.substring(0, len1);
-		String strval = str.substring(len1+1);
-		if (name.compareTo("$package") == 0)
+		String name  = str.substring(1, fndEqual);  // skip leading '$'
+		String value = str.substring(fndEqual+1);
+		if (name.compareTo("package") == 0)
 		{
 			// set package only if not already set
 			if (nsName == null)
 			{
-				nsName = strval;
+				nsName = value;
+				System.out.println("using package: '" + nsName + "'");
 			}
-			System.out.println("using package: '" + nsName + "'");
 		}
-		else if (name.compareTo("$prefix") == 0)
+		else if (name.compareTo("prefix") == 0)
 		{
 			// set prefix only if not already set
 			if (prefixName == null)
 			{
-				prefixName = strval;
+				prefixName = value;
+				System.out.println("using prefix: '" + prefixName + "'");
 			}
-			System.out.println("using prefix: '" + prefixName + "'");
 		}
-		else if (name.compareTo("$trace") == 0)
+		else if (name.compareTo("trace") == 0)
 		{
-			SetDDT(strval);
+			SetDDT(value);
 		}
-		else if (name.compareTo("$explicitEOF") == 0)
+		else if (name.compareTo("define") == 0)
 		{
-			if (strval.compareTo("true") == 0) {
+			if (value.compareTo("EXPLICIT_EOF") == 0) {
 				explicitEOF = true;
-			} else if (strval.compareTo("false") == 0) {
-				explicitEOF = false;
-			}
-			else {
-				System.out.println("ignoring unknown boolean value for pragma: '" + name + "' = '" + strval + "'");
 			}
 		}
 		else
