@@ -30,14 +30,19 @@ License
 \*---------------------------------------------------------------------------*/
 package Coco;
 
-public class Parser {
+// ----------------------------------------------------------------------------
+// Parser
+// ----------------------------------------------------------------------------
+//! A Coco/R Parser
+public class Parser
+{
 	public static final int _EOF = 0;
 	public static final int _ident = 1;
 	public static final int _number = 2;
 	public static final int _string = 3;
 	public static final int _badString = 4;
 	public static final int _char = 5;
-	public static final int maxT = 46;
+	public static final int maxT = 46;  //<! max term (w/o pragmas)
 	public static final int _ddtSym = 47;
 	public static final int _directive = 48;
 
@@ -962,7 +967,12 @@ static final int isIdent   = 0;
 } // end Parser
 
 
-class Errors {
+//-----------------------------------------------------------------------------
+// Errors
+//-----------------------------------------------------------------------------
+//! Parser error handling
+class Errors
+{
 	public int count = 0;                                    // number of errors detected
 	public java.io.PrintStream errorStream = System.out;     // error messages go to this stream
 	public String errMsgFormat = "-- line {0} col {1}: {2}"; // 0=line, 1=column, 2=text
@@ -1075,7 +1085,12 @@ class Errors {
 } // Errors
 
 
-class FatalError extends RuntimeException {
+//-----------------------------------------------------------------------------
+// FatalError
+//-----------------------------------------------------------------------------
+//! Parser fatal error handling
+class FatalError extends RuntimeException
+{
 	public static final long serialVersionUID = 1L;
 	public FatalError(String s) { super(s); }
 }

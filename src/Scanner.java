@@ -36,7 +36,12 @@ import java.io.RandomAccessFile;
 import java.util.Map;
 import java.util.HashMap;
 
-class Token {
+//-----------------------------------------------------------------------------
+// Token
+//-----------------------------------------------------------------------------
+//! Scanner Token
+class Token
+{
 	int kind;    // token kind
 	int pos;     // token position in the source text (starting at 0)
 	int col;     // token column (starting at 1)
@@ -45,10 +50,13 @@ class Token {
 	Token next;  // ML 2005-03-11 Peek tokens are kept in linked list
 }
 
-//-----------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
 // Buffer
-//-----------------------------------------------------------------------------------
-class Buffer {
+//-----------------------------------------------------------------------------
+//! Scanner Buffer
+class Buffer
+{
 	// This Buffer supports the following cases:
 	// 1) seekable stream (file)
 	//    a) whole stream in buffer
@@ -209,10 +217,13 @@ class Buffer {
 	}
 }
 
-//-----------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
 // UTF8Buffer
-//-----------------------------------------------------------------------------------
-class UTF8Buffer extends Buffer {
+//-----------------------------------------------------------------------------
+//! A Scanner Buffer variant that decodes UTF-8 characters into 16bit unicode
+class UTF8Buffer extends Buffer
+{
 	UTF8Buffer(Buffer b) { super(b); }
 
 	public int Read() {
@@ -247,14 +258,19 @@ class UTF8Buffer extends Buffer {
 	}
 }
 
-//-----------------------------------------------------------------------------------
-// StartStates  -- maps characters to start states of tokens
-//-----------------------------------------------------------------------------------
-class StartStates {
+//-----------------------------------------------------------------------------
+// StartStates
+//-----------------------------------------------------------------------------
+//! maps characters (integers) to start states of tokens
+class StartStates
+{
 	private static class Elem {
 		public int key, val;
 		public Elem next;
-		public Elem(int key, int val) { this.key = key; this.val = val; }
+		public Elem(int key, int val)
+		{
+			this.key = key; this.val = val;
+		}
 	}
 
 	private Elem[] tab = new Elem[128];
@@ -272,10 +288,13 @@ class StartStates {
 	}
 }
 
-//-----------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
 // Scanner
-//-----------------------------------------------------------------------------------
-public class Scanner {
+//-----------------------------------------------------------------------------
+//! A Coco/R Scanner
+public class Scanner
+{
 	static final char EOL = '\n';
 	static final int  eofSym = 0;
 	static final int maxT = 46;

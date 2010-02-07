@@ -38,7 +38,12 @@ import java.io.FileWriter;      /* pdt */
 import java.io.IOException;
 import java.io.File;
 
-public class Trace {
+// ----------------------------------------------------------------------------
+// Trace
+// ----------------------------------------------------------------------------
+//! Trace Output Class
+public class Trace
+{
 	File file;              /* pdt */
 	PrintWriter w;
 

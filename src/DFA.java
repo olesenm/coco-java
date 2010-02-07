@@ -48,9 +48,9 @@ import java.util.Iterator;
 //-----------------------------------------------------------------------------
 //  State
 //-----------------------------------------------------------------------------
-
 //! state of finite automaton
-class State {
+class State
+{
   public int nr;            //!< state number
   public Action firstAction;//!< to first action of this state
   public Symbol endOf;      //!< recognized token if state is final
@@ -85,9 +85,9 @@ class State {
 //-----------------------------------------------------------------------------
 //  Action
 //-----------------------------------------------------------------------------
-
 //! action of finite automaton
-class Action {
+class Action
+{
   public int typ;               //!< type of action symbol: clas, chr
   public int sym;               //!< action symbol
   public int tc;                //!< transition code: normalTrans, contextTrans
@@ -139,12 +139,13 @@ class Action {
 
 }
 
+
 //-----------------------------------------------------------------------------
 //  Target
 //-----------------------------------------------------------------------------
-
 //! set of states that are reached by an action
-class Target {
+class Target
+{
   public State state;   //!< target state
   public Target next;
 
@@ -153,12 +154,13 @@ class Target {
   }
 }
 
+
 //-----------------------------------------------------------------------------
 //  Melted
 //-----------------------------------------------------------------------------
-
 //! info about melted states
-class Melted {
+class Melted
+{
   public BitSet set;          //!< set of old states
   public State state;         //!< new state
   public Melted next;
@@ -169,12 +171,13 @@ class Melted {
 
 }
 
+
 //-----------------------------------------------------------------------------
 //  Comment
 //-----------------------------------------------------------------------------
-
 //! info about comment syntax
-class Comment {
+class Comment
+{
   public String start;
   public String stop;
   public boolean nested;
@@ -186,12 +189,15 @@ class Comment {
 
 }
 
+
 //-----------------------------------------------------------------------------
 //  CharSet
 //-----------------------------------------------------------------------------
+//! A set containing ranges of characters
+class CharSet
+{
 
-class CharSet {
-
+	//! A character range within a character set
 	public static class Range {
 		int from, to;
 		Range next;
@@ -297,11 +303,13 @@ class CharSet {
 	}
 }
 
+
 //-----------------------------------------------------------------------------
 //  DFA
 //-----------------------------------------------------------------------------
-
-public class DFA {
+//! Generation of the Scanner Automaton
+public class DFA
+{
   static final int EOF = -1;
 
   public int maxStates;

@@ -1,6 +1,4 @@
 /*---------------------------------------------------------------------------*\
-ParserGen.java -- Generation of the Recursive Descent Parser
-
     Compiler Generator Coco/R,
     Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
     extended by M. Loeberbauer & A. Woess, Univ. of Linz
@@ -44,8 +42,12 @@ import java.io.FileWriter;         /* pdt */
 import java.util.ArrayList;
 import java.util.BitSet;
 
-public class ParserGen {
-
+// ----------------------------------------------------------------------------
+// ParserGen
+// ----------------------------------------------------------------------------
+//! Parser generator -- Generation of the Recursive Descent Parser
+public class ParserGen
+{
   static final int maxTerm = 3;   //!< sets of size < maxTerm are enumerated
   static final int EOF = -1;
   static final String ls = System.getProperty("line.separator");
@@ -321,15 +323,23 @@ public class ParserGen {
   }
 
   void GenTokens() {
-    //foreach (Symbol sym in Symbol.terminals) {
+    // tokens:
+    // foreach (Symbol sym in tab.terminals) {
     for (int i = 0; i < tab.terminals.size(); i++) {
       Symbol sym = (Symbol)tab.terminals.get(i);
       if (Character.isLetter(sym.name.charAt(0)))
         gen.println("\tpublic static final int _" + sym.name + " = " + sym.n + ";");
     }
-  }
 
-  void GenPragmas() {
+    gen.println
+    (
+        "\tpublic static final int maxT = "
+      + (tab.terminals.size()-1)
+      + ";  //<! max term (w/o pragmas)"
+    );
+
+    // pragmas:
+    // foreach (Symbol sym in tab.pragmas) {
     for (int i = 0; i < tab.pragmas.size(); i++) {
       Symbol sym = (Symbol)tab.pragmas.get(i);
       gen.println("\tpublic static final int _" + sym.name + " = " + sym.n + ";");
@@ -434,8 +444,6 @@ public class ParserGen {
     }
     CopyFramePart("-->constants");
     GenTokens();
-    gen.println("\tpublic static final int maxT = " + (tab.terminals.size()-1) + ";");
-    GenPragmas();
     CopyFramePart("-->declarations"); CopySourcePart(semDeclPos, 0);
 
     CopyFramePart("-->pragmas"); GenCodePragmas();

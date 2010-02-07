@@ -43,8 +43,12 @@ import java.util.Iterator;
 import java.io.PrintWriter;
 
 
+// ----------------------------------------------------------------------------
+// Position
+// ----------------------------------------------------------------------------
 //! position of source code stretch (e.g. semantic action, resolver expressions)
-class Position {
+class Position
+{
 	public int beg;    //!< start relative to the beginning of the file
 	public int end;    //!< end of stretch
 	public int col;    //!< column number of start position
@@ -54,17 +58,24 @@ class Position {
 	}
 }
 
+
+// ----------------------------------------------------------------------------
+// SymInfo
+// ----------------------------------------------------------------------------
 //! output attribute of symbols in the ATG
-class SymInfo {
+class SymInfo
+{
 	String name;
 	int kind;         //!< 0 = ident, 1 = string
 }
 
-//=====================================================================
-// Symbol
-//=====================================================================
 
-class Symbol {
+// ----------------------------------------------------------------------------
+// Symbol
+// ----------------------------------------------------------------------------
+//! Grammar Symbol
+class Symbol
+{
 	// token kinds
 	public static final int fixedToken    = 0; //!< e.g. 'a' ('b' | 'c') (structure of literals)
 	public static final int classToken    = 1; //!< e.g. digit {digit}   (at least one char class)
@@ -94,11 +105,12 @@ class Symbol {
 }
 
 
-//=====================================================================
+// ----------------------------------------------------------------------------
 // Node
-//=====================================================================
+// ----------------------------------------------------------------------------
 
-class Node {
+class Node
+{
 	// constants for node kinds
 	public static final int t    =  1;  //!< terminal symbol
 	public static final int pr   =  2;  //!< pragma
@@ -144,11 +156,13 @@ class Node {
 
 }
 
-//=====================================================================
-// Graph
-//=====================================================================
 
-class Graph {
+// ----------------------------------------------------------------------------
+// Graph
+// ----------------------------------------------------------------------------
+//! A connection of nodes
+class Graph
+{
 	public Node l;  //!< left end of graph = head
 	public Node r;  //!< right end of graph = list of nodes to be linked to successor graph
 
@@ -164,11 +178,13 @@ class Graph {
 
 }
 
-//=====================================================================
-// Sets
-//=====================================================================
-class Sets {
 
+// ----------------------------------------------------------------------------
+// Sets
+// ----------------------------------------------------------------------------
+//! Functions for BitSet operations
+class Sets
+{
 	public static int Elements(BitSet s) {
 		return s.cardinality();
 	}
@@ -190,11 +206,12 @@ class Sets {
 
 }
 
-//=====================================================================
+// -----------------------------------------------------------------------------
 // CharClass
-//=====================================================================
-
-class CharClass {
+// -----------------------------------------------------------------------------
+//! names character classes
+class CharClass
+{
 	public int n;       //!< class number
 	public String name; //!< class name
 	public CharSet set; //!< set representing the class
@@ -204,12 +221,14 @@ class CharClass {
 	}
 }
 
-//===========================================================
+
+// ----------------------------------------------------------------------------
 // Tab
-//===========================================================
+// ----------------------------------------------------------------------------
 
 //! Symbol Table Management
-public class Tab {
+public class Tab
+{
 	static final char CR  = '\r';
 	static final char LF  = '\n';
 
@@ -1033,7 +1052,9 @@ public class Tab {
 
 	//--------------- check for circular productions ----------------------
 
-	class CNode {	// node of list for finding circular productions
+	//! node of list for finding circular productions
+	class CNode
+	{
 		public Symbol left, right;
 
 		public CNode (Symbol l, Symbol r) {
@@ -1405,11 +1426,13 @@ public class Tab {
 		}
 	}
 
+	//! @cond internalClass
 	class SymbolComp implements Comparator {
 		public int compare(Object x, Object y) {
 			return ((Symbol) x).name.compareTo(((Symbol) y).name);
 		}
 	}
+	//! @endcond internalClass
 
 	void CopySourcePart(PrintWriter dest, Position pos, int indent) {
 		// Copy text described by pos from atg to dest
