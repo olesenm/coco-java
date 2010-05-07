@@ -1436,7 +1436,7 @@ public class Tab
 			return ((Symbol) x).name.compareTo(((Symbol) y).name);
 		}
 	}
-	//! @endcond internalClass
+	//! @endcond
 
 	void CopySourcePart(PrintWriter dest, Position pos, int indent) {
 		// Copy text described by pos from atg to dest
