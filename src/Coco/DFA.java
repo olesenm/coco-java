@@ -221,7 +221,7 @@ class CharSet
 				else if (i == cur.to + 1) {
 					cur.to++;
 					Range next = cur.next;
-					if (next != null && cur.to == next.from - 1) { cur.to = next.to; cur.next = next.next; };
+					if (next != null && cur.to == next.from - 1) { cur.to = next.to; cur.next = next.next; }
 				}
 				return;
 			}

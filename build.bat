@@ -2,7 +2,7 @@ cd src
 md build
 
 cd Coco
-javac -source 1.4 -target 1.4 -d ..\build Trace.java Scanner.java Tab.java DFA.java ParserGen.java Parser.java Coco.java
+javac -source 1.5 -target 1.5 -d ..\build Trace.java Scanner.java Tab.java DFA.java ParserGen.java Parser.java Coco.java
 cd ..
 
 jar cfm Coco.jar ..\manifest.mf -C build Coco

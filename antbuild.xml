@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Coco/R" default="usage" basedir=".">
+
+  <!-- set global properties for this build -->
+  <property name="src"   location="src/Coco"/>
+  <property name="build" location="build/classes"/>
+  <property name="dist"  location="dist"/>
+  <property name="docs"  location="html"/>
+
+  <property name="javac.version"     value="1.5"/>
+  <property name="javac.compilerarg" value="-Xlint:-serial"/>
+  <!-- <property name="javac.compilerarg" value="-Xlint:unchecked"/> -->
+
+  <!--
+   | usage:
+   -->
+  <target name="usage" description="provide usage">
+    <echo>
+Ant Targets:
+    build    : compile Coco/R Coco/R sources
+    dist     : generate a distribution JAR file
+    doc      : generate doxygen documentation
+
+    clean    : clean up after build
+    docclean : remove doxygen documentation
+    distclean: remove generated jar file and invoke clean/docclean
+
+    zip      : create a zip file with the Coco/R sources
+    self     : create the Coco/R parser/scanner from the atg
+    </echo>
+  </target>
+
+  <!-- provide convenient aliases -->
+  <target name="help">
+    <antcall target="usage"/>
+  </target>
+  <target name="compile">
+    <antcall target="build"/>
+  </target>
+  <target name="make">
+    <antcall target="dist"/>
+  </target>
+  <target name="self">
+    <antcall target="parser"/>
+  </target>
+
+  <target name="init">
+    <tstamp/>
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+  </target>
+
+  <!--
+   | build:
+   -->
+  <target name="build" depends="init" description="compile the source">
+    <echo level="info" message="Compiling Coco/R ..."/>
+    <javac
+        srcdir="${src}" 
+        destdir="${build}"
+        source="${javac.version}"
+        target="${javac.version}"
+        >
+      <include name="*.java"/>
+      <compilerarg value="${javac.compilerarg}"/>
+    </javac>
+  </target>
+
+
+  <!--
+   | dist:
+   -->
+  <target name="dist" depends="build" description="generate the distribution">
+    <echo level="info" message="Generating Coco/R jar ..."/>
+
+    <!-- Create the distribution directory -->
+    <mkdir dir="${dist}"/>
+
+    <!-- Put everything from ${build} into {dist}/XXX.jar file -->
+    <jar
+        jarfile="${dist}/Coco.jar"
+        basedir="${build}"
+        manifest="manifest.mf"
+        />
+  </target>
+
+  <!--
+   | doc:
+   -->
+  <target name="doc">
+    <exec executable="doxygen"/>
+  </target>
+
+  <target name="clean" description="remove compiled classes">
+    <delete dir="${build}"/>
+  </target>
+
+  <target name="docclean" description="remove doxygen documentation">
+    <delete dir="${docs}"/>
+  </target>
+
+  <target name="distclean" depends="docclean,clean">
+    <delete dir="${dist}"/>
+  </target>
+
+
+  <target name="zip">
+    <echo level="info" message="Packing Coco/R sources as zip file ..."/>
+    <zip
+        basedir="."
+        destfile="coco-java-sources.zip"
+        includes="
+            autoconf/** src/**
+            *.bat
+            *.sh
+            *.xml
+            configure
+            Doxyfile
+            INSTALL
+            manifest.mf
+            README.mkdn
+            "/>
+  </target>
+
+
+  <target name="parser" depends="dist">
+    <echo level="info" message="Use Coco/R to rebuild its own parser"/>
+    <java jar="${dist}/Coco.jar" fork="true">
+      <arg line="${src}/Coco-java.atg -bak" />
+    </java>
+  </target>
+
+
+  <target name="svn-diff">
+    <exec executable="svn">
+      <arg value="diff" />
+      <arg value="--diff-cmd" />
+      <arg value="diff" />
+      <arg value="-x" />
+      <arg value="-uw" />
+    </exec>
+  </target>
+
+</project>
+
