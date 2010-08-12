@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([Coco/R Java], [20090104], [Moessenboeck AT ssw.jku.at], [coco-java])
+AC_INIT([Coco/R Java], [20100812], [Moessenboeck AT ssw.jku.at], [coco-java])
 AC_CONFIG_AUX_DIR(autoconf)
 AC_CONFIG_SRCDIR([src/Coco/Coco.java])
 
