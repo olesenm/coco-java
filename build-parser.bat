@@ -1,1 +1,1 @@
-java -jar Coco.jar src/Coco-java.atg -bak
+java -jar Coco.jar src/Coco/Coco-java.atg -bak

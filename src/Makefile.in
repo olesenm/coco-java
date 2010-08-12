@@ -5,9 +5,9 @@ JAVAC = @JAVAC@
 JAVA  = @JAVA@
 JAR   = @JAR@
 
-#---------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Installation information.
-#---------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 bindir = @bindir@
 builddir = @builddir@
 datadir = @datadir@
@@ -22,36 +22,55 @@ srcdir = @srcdir@
 
 INSTALL      = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
-DATA_FILES = $(srcdir)/Parser.frame $(srcdir)/Scanner.frame
-DOC_FILES  = $(srcdir)/Coco-java.atg
+DATA_FILES = $(srcdir)/Coco/Parser.frame $(srcdir)/Coco/Scanner.frame
+DOC_FILES  = $(srcdir)/Coco/Coco-java.atg
 DATA_DIR   = $(datarootdir)/coco-java
 LIB_COCO   = $(libdir)/coco-java
 
-COCO = ../Coco.jar
+
+# use same directories as ant
+ANT_BUILD = ../build
+ANT_DIST = ../dist
+ANT_CLASSES = $(ANT_BUILD)/classes
+
+COCO = Coco.jar
 WRAPPER = coco-java
 
-# -----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # There should be no need to modify anything below here.
-# -----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
-all: $(COCO) $(WRAPPER)
+all: $(ANT_DIST)/$(COCO) $(ANT_DIST)/$(WRAPPER)
 
-$(COCO): *.java
-	$(JAVAC) -d . $^
-	$(JAR) cfm $@ Coco.manifest Coco/
-	rm -rf Coco/
+#
+# compile into build/classes/
+# create jar into dist/
+#
+$(ANT_DIST)/$(COCO): $(srcdir)/Coco/*.java
+	mkdir -p $(ANT_CLASSES)
+	mkdir -p $(ANT_DIST)
+	@echo "# create Coco.jar"
+	@echo "#"
+	$(JAVAC) -d $(ANT_CLASSES) $^
+	$(JAR) cfm $@ $(srcdir)/../manifest.mf -C $(ANT_CLASSES) Coco
 
-$(WRAPPER): $(WRAPPER).in Makefile
+#
+# create coco-java wrapper in dist/
+#
+$(ANT_DIST)/$(WRAPPER): $(WRAPPER).in Makefile
+	@echo "# create coco-java wrapper"
+	@echo "#"
 	sed -e "s|\@JAVA\@|$(JAVA)|g" -e "s|\@LIB_COCO\@|$(LIB_COCO)|g" < $< > $@
-	chmod +x $@
+	@chmod +x $@
 
-# -----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 clean:
 	/bin/rm -f *~ \#*
+	/bin/rm -rf $(ANT_BUILD)
 
 distclean: clean
-	/bin/rm -rf Makefile $(WRAPPER) $(srcdir)/*.bak
+	/bin/rm -rf Makefile $(ANT_DIST) $(srcdir)/*.bak $(srcdir)/Coco/*.bak
 
 install_bin_directories:
 	mkdir -p $(bindir)
@@ -63,10 +82,10 @@ install_data_directories:
 	mkdir -p $(DATA_DIR)
 
 install_bin: install_bin_directories
-	$(INSTALL) $(WRAPPER) $(bindir)/
+	$(INSTALL) $(ANT_DIST)/$(WRAPPER) $(bindir)/
 
 install_lib: install_lib_directories
-	$(INSTALL) $(COCO) $(LIB_COCO)/
+	$(INSTALL) $(ANT_DIST)/$(COCO) $(LIB_COCO)/
 
 install_data: install_data_directories
 	@for i in $(DATA_FILES); \
@@ -85,4 +104,4 @@ install: all install_bin install_lib install_data
     install_lib install_lib_directories \
     install_data install_bin_directories
 
-# -----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------

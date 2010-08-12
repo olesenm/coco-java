@@ -1,6 +1,13 @@
 cd src
-javac -source 1.4 -target 1.4 -d . Trace.java Scanner.java Tab.java DFA.java ParserGen.java Parser.java Coco.java
-jar cfm Coco.jar Coco.manifest Coco
-del Coco\*.class
-rd  Coco
+md build
+
+cd Coco
+javac -source 1.4 -target 1.4 -d ..\build Trace.java Scanner.java Tab.java DFA.java ParserGen.java Parser.java Coco.java
+cd ..
+
+jar cfm Coco.jar ..\manifest.mf -C build Coco
+
+del build\Coco\*.class
+rd  build\Coco
+rd  build
 cd ..

@@ -7,22 +7,25 @@ all: Coco
 
 Coco: makefiles
 	cd src && $(MAKE) all
+	@echo
 
 Makefile: configure autoconf/Makefile.in
-	@echo "Makefile is older than the configure script".
-	@echo "Please re-run the configure script."
+	@echo "# Makefile is older than the configure script".
+	@echo "# Please re-run the configure script."
+	@echo "#"
 	@exit 1
 
 src/Makefile: configure src/Makefile.in
-	@echo "src/Makefile is older than its dependencies".
-	@echo "Please re-run the configure script."
+	@echo "# src/Makefile is older than its dependencies".
+	@echo "# Please re-run the configure script."
+	@echo "#"
 	@exit 1
 
 makefiles: Makefile src/Makefile
 
 doc:
-	@echo "create doxygen documentation"
-	@echo
+	@echo "# create doxygen documentation"
+	@echo "#"
 	doxygen
 
 clean:
@@ -30,16 +33,26 @@ clean:
 	cd src && $(MAKE) clean
 
 docclean:
-	@echo "remove doxygen documentation"
-	@echo
-	/bin/rm -f html/*
+	@echo "# remove doxygen documentation"
+	@echo "#"
+	/bin/rm -rf html
 
 distclean: docclean
-	/bin/rm -f *~ Coco.net Makefile config.status config.log config.cache
+	/bin/rm -f *~ Makefile config.status config.log config.cache
 	cd src && $(MAKE) distclean
 
 install: makefiles
 	cd src && $(MAKE) install
+
+tar:
+	@echo "Packing Coco/R sources as tar.gz ..."
+	tar -cf coco-java-sources.tar.gz autoconf src \
+	*.bat *.sh *.xml configure Doxyfile INSTALL manifest.mf README.mkdn
+
+zip:
+	@echo "Packing Coco/R sources as zip ..."
+	zip -r -q -9 coco-java-sources.zip autoconf src \
+	*.bat *.sh *.xml configure Doxyfile INSTALL manifest.mf README.mkdn
 
 
 configure: autoconf/configure.ac
@@ -53,6 +66,6 @@ autoconf/config.guess: /usr/share/misc/config.guess
 autoconf/config.sub: /usr/share/misc/config.sub
 	/bin/cp -f /usr/share/misc/config.sub autoconf/config.sub
 
-.PHONY: Coco all clean docclean distclean install makefiles
+.PHONY: Coco all doc clean docclean distclean install makefiles tar zip
 
 # -----------------------------------------------------------------------------

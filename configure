@@ -600,8 +600,7 @@ PACKAGE_VERSION='20090104'
 PACKAGE_STRING='Coco/R Java 20090104'
 PACKAGE_BUGREPORT='Moessenboeck AT ssw.jku.at'
 
-ac_unique_file="src/Coco.java"
-ac_unique_file="src/Coco.java"
+ac_unique_file="src/Coco/Coco.java"
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 INSTALL_DATA
@@ -1745,8 +1744,6 @@ fi
 ac_config_guess="$SHELL $ac_aux_dir/config.guess"  # Please don't use this var.
 ac_config_sub="$SHELL $ac_aux_dir/config.sub"  # Please don't use this var.
 ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
-
-
 
 
 

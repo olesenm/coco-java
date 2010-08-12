@@ -18,6 +18,7 @@ USAGE
 cd ${0%/*} || exit 1    # run from this directory
 
 unset warn
+builddir=build/tmp$$    # tmp directory for building
 
 # parse options
 while [ "$#" -gt 0 ]
@@ -40,25 +41,42 @@ do
 done
 
 
+mkdir -p $builddir
+[ -d $builddir ] || {
+    echo
+    echo "Error: apparently problems creating $builddir"
+    echo
+    exit 1
+}
+
 echo "compile Coco executable"
 echo "~~~~~~~~~~~~~~~~~~~~~~~"
-echo "javac -d src $warn src/*.java"
+echo "javac -d $builddir $warn src/Coco/*.java"
 echo
 
-javac -d src $warn src/*.java
+javac -d $builddir $warn src/Coco/*.java
+
 if [ $? -eq 0 ]
 then
     echo
-    echo "done"
     echo "create Coco.jar file"
-    echo "    jar cfm Coco.jar src/Coco.manifest -C src Coco"
+    echo "    jar cfm Coco.jar manifest.mf -C $builddir Coco"
     echo
-    jar cfm Coco.jar src/Coco.manifest -C src Coco
-    rm -rf src/Coco/
+    jar cfm Coco.jar manifest.mf -C $builddir Coco
 else
     echo
     echo "errors detected in compilation"
     echo
 fi
+
+echo
+echo "cleanup $builddir directory"
+
+rm -rf $builddir
+rmdir build 2>/dev/null
+
+echo
+echo "Done"
+echo
 
 # ----------------------------------------------------------------- end-of-file

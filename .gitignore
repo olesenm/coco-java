@@ -24,14 +24,14 @@
 *.la
 *.so
 *.jar
+*.zip
 
 # Corefiles
 core
 
-# ignore generated classes
-/src/Coco
-
-# ignore Doxygen docs
+# ignore generated classes, jar files, doxygen docs
+/build
+/dist
 /html
 
 # ignore autoconf files
@@ -39,7 +39,6 @@ core
 /config.log
 /config.status
 /src/Makefile
-/src/coco-java
 
 autom4te.cache
 
