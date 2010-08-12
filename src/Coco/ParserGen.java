@@ -66,7 +66,7 @@ public class ParserGen
   StringWriter err;  //!< generated parser error messages
   String srcName;    //!< name of attributed grammar file
   String srcDir;     //!< directory of attributed grammar file
-  ArrayList symSet = new ArrayList();
+  ArrayList<BitSet> symSet = new ArrayList<BitSet>();
 
   Tab tab;           // other Coco objects
 
@@ -163,8 +163,8 @@ public class ParserGen
 
   int NewCondSet (BitSet s) {
     for (int i = 1; i < symSet.size(); i++) // skip symSet[0] (reserved for union of SYNC sets)
-      if (Sets.Equals(s, (BitSet)symSet.get(i))) return i;
-    symSet.add(s.clone());
+      if (Sets.Equals(s, symSet.get(i))) return i;
+    symSet.add((BitSet)s.clone());
     return symSet.size() - 1;
   }
 
@@ -175,7 +175,7 @@ public class ParserGen
       if (n == 0) gen.print("false"); // happens if an ANY set matches no symbol
       else if (n <= maxTerm) {
         for (int i = 0; i < tab.terminals.size(); i++) {
-          Symbol sym = (Symbol)tab.terminals.get(i);
+          Symbol sym = tab.terminals.get(i);
           if (s.get(sym.n)) {
             gen.print("la.kind == " + sym.n);
             --n;
@@ -189,7 +189,7 @@ public class ParserGen
 
   void PutCaseLabels (BitSet s) {
     for (int i = 0; i < tab.terminals.size(); i++) {
-      Symbol sym = (Symbol)tab.terminals.get(i);
+      Symbol sym = tab.terminals.get(i);
       if (s.get(sym.n)) gen.print("case " + sym.n + ": ");
     }
   }
@@ -326,7 +326,7 @@ public class ParserGen
     // tokens:
     // foreach (Symbol sym in tab.terminals) {
     for (int i = 0; i < tab.terminals.size(); i++) {
-      Symbol sym = (Symbol)tab.terminals.get(i);
+      Symbol sym = tab.terminals.get(i);
       if (Character.isLetter(sym.name.charAt(0)))
         gen.println("\tpublic static final int _" + sym.name + " = " + sym.n + ";");
     }
@@ -341,7 +341,7 @@ public class ParserGen
     // pragmas:
     // foreach (Symbol sym in tab.pragmas) {
     for (int i = 0; i < tab.pragmas.size(); i++) {
-      Symbol sym = (Symbol)tab.pragmas.get(i);
+      Symbol sym = tab.pragmas.get(i);
       gen.println("\tpublic static final int _" + sym.name + " = " + sym.n + ";");
     }
   }
@@ -349,7 +349,7 @@ public class ParserGen
   void GenCodePragmas() {
     //foreach (Symbol sym in Symbol.pragmas) {
     for (int i = 0; i < tab.pragmas.size(); i++) {
-      Symbol sym = (Symbol)tab.pragmas.get(i);
+      Symbol sym = tab.pragmas.get(i);
       gen.println();
       gen.println("\t\t\tif (la.kind == " + sym.n + ") {");
       CopySourcePart(sym.semPos, 4);
@@ -359,7 +359,7 @@ public class ParserGen
 
   void GenProductions() {
     for (int i = 0; i < tab.nonterminals.size(); i++) {
-      Symbol sym = (Symbol)tab.nonterminals.get(i);
+      Symbol sym = tab.nonterminals.get(i);
       curSy = sym;
       gen.print("\t");
       if (sym.retType == null) gen.print("void "); else gen.print(sym.retType + " ");
@@ -376,12 +376,12 @@ public class ParserGen
 
   void InitSets() {
     for (int i = 0; i < symSet.size(); i++) {
-      BitSet s = (BitSet)symSet.get(i);
+      BitSet s = symSet.get(i);
       gen.print("\t\t{");
       int j = 0;
       //foreach (Symbol sym in Symbol.terminals) {
       for (int k = 0; k < tab.terminals.size(); k++) {
-        Symbol sym = (Symbol)tab.terminals.get(k);
+        Symbol sym = tab.terminals.get(k);
         if (s.get(sym.n)) gen.print("T,"); else gen.print("x,");
         ++j;
         if (j%4 == 0) gen.print(" ");
@@ -425,7 +425,7 @@ public class ParserGen
     err = new StringWriter();
     //foreach (Symbol sym in Symbol.terminals)
     for (int i = 0; i < tab.terminals.size(); i++) {
-      Symbol sym = (Symbol)tab.terminals.get(i);
+      Symbol sym = tab.terminals.get(i);
       GenErrorMsg(tErr, sym);
     }
 

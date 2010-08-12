@@ -676,7 +676,7 @@ public class DFA
       for (Action action = state.firstAction; action != null; action = action.next) {
         if (first) {trace.Write(" "); first = false;} else trace.Write("                   ");
         if (action.typ == Node.clas)
-          trace.Write(((CharClass)tab.classes.get(action.sym)).name);
+          trace.Write(tab.classes.get(action.sym).name);
         else trace.Write(Ch((char)action.sym), 3);
         for (Target targ = action.target; targ != null; targ = targ.next)
           trace.Write(Integer.toString(targ.state.nr), 3);

@@ -634,7 +634,7 @@ static final int isIdent   = 0;
 			s = Sym();
 			Symbol sym = tab.FindSym(s.name);
 			if (sym == null && s.kind == isLiteral)
-			  sym = (Symbol)tab.literals.get(s.name);
+			  sym = tab.literals.get(s.name);
 			boolean undef = (sym == null);
 			if (undef) {
 			  if (s.kind == isIdent)

@@ -361,7 +361,7 @@ Factor<out Graph g>             (. SymInfo s; Position pos; boolean weak = false
   ]
   Sym<out s>                    (. Symbol sym = tab.FindSym(s.name);
                                    if (sym == null && s.kind == isLiteral)
-                                     sym = (Symbol)tab.literals.get(s.name);
+                                     sym = tab.literals.get(s.name);
                                    boolean undef = (sym == null);
                                    if (undef) {
                                      if (s.kind == isIdent)
