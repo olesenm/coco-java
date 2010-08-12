@@ -295,15 +295,10 @@ public class Tab
 	}
 
 	public Symbol FindSym(String name) {
-		Symbol s;
-		//foreach (Symbol s in terminals)
-		for (int i = 0; i < terminals.size(); i++) {
-			s = terminals.get(i);
+		for (Symbol s : terminals) {
 			if (s.name.compareTo(name) == 0) return s;
 		}
-		//foreach (Symbol s in nonterminals)
-		for (int i = 0; i < nonterminals.size(); i++) {
-			s = nonterminals.get(i);
+		for (Symbol s : nonterminals) {
 			if (s.name.compareTo(name) == 0) return s;
 		}
 		return null;
@@ -333,17 +328,14 @@ public class Tab
 		trace.WriteLine("Symbol Table:");
 		trace.WriteLine("------------"); trace.WriteLine();
 		trace.WriteLine(" nr name           typ  hasAt graph  del   line tokenKind");
-		//foreach (Symbol sym in Symbol.terminals)
-		for (int i = 0; i < terminals.size(); i++) {
-			PrintSym(terminals.get(i));
+		for (Symbol sym : terminals) {
+			PrintSym(sym);
 		}
-		//foreach (Symbol sym in Symbol.pragmas)
-		for (int i = 0; i < pragmas.size(); i++) {
-			PrintSym(pragmas.get(i));
+		for (Symbol sym : pragmas) {
+			PrintSym(sym);
 		}
-		//foreach (Symbol sym in Symbol.nonterminals)
-		for (int i = 0; i < nonterminals.size(); i++) {
-			PrintSym(nonterminals.get(i));
+		for (Symbol sym : nonterminals) {
+			PrintSym(sym);
 		}
 		trace.WriteLine();
 		trace.WriteLine("Literal Tokens:");
@@ -360,9 +352,7 @@ public class Tab
 
 	public void PrintSet(BitSet s, int indent) {
 		int col = indent;
-		//foreach (Symbol sym in Symbol.terminals) {
-		for (int i = 0; i < terminals.size(); i++) {
-			Symbol sym = terminals.get(i);
+		for (Symbol sym : terminals) {
 			if (s.get(sym.n)) {
 				int len = sym.name.length();
 				if (col + len >= 80) {
@@ -540,9 +530,7 @@ public class Tab
 		trace.WriteLine("   n type name          next  down   sub   pos  line");
 		trace.WriteLine("                               val  code");
 		trace.WriteLine("----------------------------------------------------");
-		//foreach (Node p in nodes) {
-		for (int i = 0; i < nodes.size(); i++) {
-			Node p = nodes.get(i);
+		for (Node p : nodes) {
 			trace.Write(Integer.toString(p.n), 4);
 			trace.Write(" " + nTyp[p.typ] + " ");
 			if (p.sym != null) {
@@ -605,18 +593,14 @@ public class Tab
 	}
 
 	public CharClass FindCharClass(String name) {
-		//foreach (CharClass c in classes)
-		for (int i = 0; i < classes.size(); i++) {
-			CharClass c = classes.get(i);
+		for (CharClass c : classes) {
 			if (c.name.compareTo(name) == 0) return c;
 		}
 		return null;
 	}
 
 	public CharClass FindCharClass(CharSet s) {
-		//foreach (CharClass c in classes)
-		for (int i = 0; i < classes.size(); i++) {
-			CharClass c = classes.get(i);
+		for (CharClass c : classes) {
 			if (s.Equals(c.set)) return c;
 		}
 		return null;
@@ -641,9 +625,7 @@ public class Tab
 	}
 
 	public void WriteCharClasses () {
-		//foreach (CharClass c in classes) {
-		for (int i = 0; i < classes.size(); i++) {
-			CharClass c = classes.get(i);
+		for (CharClass c : classes) {
 			trace.Write(c.name + ": ", -10);
 			WriteCharSet(c.set);
 			trace.WriteLine();
@@ -701,16 +683,11 @@ public class Tab
 
 
 	void CompFirstSets() {
-		Symbol sym;
-		//foreach (Symbol sym in Symbol.nonterminals) {
-		for (int i = 0; i < nonterminals.size(); i++) {
-			sym = nonterminals.get(i);
+		for (Symbol sym : nonterminals) {
 			sym.first = new BitSet(terminals.size());
 			sym.firstReady = false;
 		}
-		//foreach (Symbol sym in Symbol.nonterminals) {
-		for (int i = 0; i < nonterminals.size(); i++) {
-			sym = nonterminals.get(i);
+		for (Symbol sym : nonterminals) {
 			sym.first = First(sym.graph);
 			sym.firstReady = true;
 		}
@@ -736,9 +713,7 @@ public class Tab
 	void Complete(Symbol sym) {
 		if (!visited.get(sym.n)) {
 			visited.set(sym.n);
-			//foreach (Symbol s in Symbol.nonterminals) {
-			for (int i = 0; i < nonterminals.size(); i++) {
-				Symbol s = nonterminals.get(i);
+			for (Symbol s : nonterminals) {
 				if (sym.nts.get(s.n)) {
 					Complete(s);
 					sym.follow.or(s.follow);
@@ -837,10 +812,7 @@ public class Tab
 	}
 
 	void CompAnySets() {
-		Symbol sym;
-		//foreach (Symbol sym in Symbol.nonterminals)
-		for (int i = 0; i < nonterminals.size(); i++) {
-			sym = nonterminals.get(i);
+		for (Symbol sym : nonterminals) {
 			FindAS(sym.graph);
 		}
 	}
@@ -877,7 +849,7 @@ public class Tab
 		allSyncSets = new BitSet(terminals.size());
 		allSyncSets.set(eofSy.n);
 		visited = new BitSet(nodes.size());
-		//foreach (Symbol sym in Symbol.nonterminals) {
+		//foreach (Symbol sym in nonterminals) {
 		for (int i = 0; i < nonterminals.size(); i++) {
 			curSy = nonterminals.get(i);
 			CompSync(curSy.graph);
@@ -885,9 +857,7 @@ public class Tab
 	}
 
 	public void SetupAnys() {
-		//foreach (Node p in Node.nodes)
-		for (int i = 0; i < nodes.size(); i++) {
-			Node p = nodes.get(i);
+		for (Node p : nodes) {
 			if (p.typ == Node.any) {
 				p.set = new BitSet(terminals.size());
 				p.set.set(0, terminals.size());
@@ -898,29 +868,22 @@ public class Tab
 
 	public void CompDeletableSymbols() {
 		boolean changed;
-		Symbol sym;
 		do {
 			changed = false;
-			//foreach (Symbol sym in Symbol.nonterminals)
-			for (int i = 0; i < nonterminals.size(); i++) {
-				sym = nonterminals.get(i);
+			for (Symbol sym : nonterminals) {
 				if (!sym.deletable && sym.graph != null && DelGraph(sym.graph)) {
 					sym.deletable = true; changed = true;
 				}
 			}
 		} while (changed);
-		//foreach (Symbol sym in Symbol.nonterminals)
-		for (int i = 0; i < nonterminals.size(); i++) {
-			sym = nonterminals.get(i);
+		for (Symbol sym : nonterminals) {
 			if (sym.deletable) errors.Warning("  " + sym.name + " deletable");
 		}
 	}
 
 	public void RenumberPragmas() {
 		int n = terminals.size();
-		//foreach (Symbol sym in Symbol.pragmas)
-		for (int i = 0; i < pragmas.size(); i++) {
-			Symbol sym = pragmas.get(i);
+		for (Symbol sym : pragmas) {
 			sym.n = n++;
 		}
 	}
@@ -935,10 +898,7 @@ public class Tab
 			trace.WriteLine();
 			trace.WriteLine("First & follow symbols:");
 			trace.WriteLine("----------------------"); trace.WriteLine();
-			Symbol sym;
-			//foreach (Symbol sym in Symbol.nonterminals) {
-			for (int i = 0; i < nonterminals.size(); i++) {
-				sym = nonterminals.get(i);
+			for (Symbol sym : nonterminals) {
 				trace.WriteLine(sym.name);
 				trace.Write("first:   "); PrintSet(sym.first, 10);
 				trace.Write("follow:  "); PrintSet(sym.follow, 10);
@@ -949,9 +909,7 @@ public class Tab
 			trace.WriteLine();
 			trace.WriteLine("ANY and SYNC sets:");
 			trace.WriteLine("-----------------");
-			//foreach (Node p in Node.nodes)
-			for (int i = 0; i < nodes.size(); i++) {
-				Node p = nodes.get(i);
+			for (Node p : nodes) {
 				if (p.typ == Node.any || p.typ == Node.sync) {
 					trace.Write(Integer.toString(p.n), 4);
 					trace.Write(" ");
@@ -1082,12 +1040,10 @@ public class Tab
 	public boolean NoCircularProductions() {
 		boolean ok, changed, onLeftSide, onRightSide;
 		ArrayList<CNode> list = new ArrayList<CNode>();
-		for (int i = 0; i < nonterminals.size(); i++) {
-			Symbol sym = nonterminals.get(i);
+		for (Symbol sym : nonterminals) {
 			ArrayList<Symbol> singles = new ArrayList<Symbol>();
 			GetSingles(sym.graph, singles); // get nonterminals s such that sym-->s
-			for (int j = 0; j < singles.size(); j++) {
-				Symbol s = singles.get(j);
+			for (Symbol s : singles) {
 				list.add(new CNode(sym, s));
 			}
 		}
@@ -1130,8 +1086,7 @@ public class Tab
 	}
 
 	void CheckOverlap(BitSet s1, BitSet s2, int cond) {
-		for (int i = 0; i < terminals.size(); i++) {
-			Symbol sym = terminals.get(i);
+		for (Symbol sym : terminals) {
 			if (s1.get(sym.n) && s2.get(sym.n)) LL1Error(cond, sym);
 		}
 	}
@@ -1220,7 +1175,7 @@ public class Tab
 	}
 
 	public void CheckResolvers() {
-		//foreach (Symbol sym in Symbol.nonterminals) {
+		//foreach (Symbol sym in nonterminals) {
 		for (int i = 0; i < nonterminals.size(); i++) {
 			curSy = nonterminals.get(i);
 			CheckRes(curSy.graph, false);
@@ -1231,8 +1186,7 @@ public class Tab
 
 	public boolean NtsComplete() {
 		boolean complete = true;
-		for (int i = 0; i < nonterminals.size(); i++) {
-			Symbol sym = nonterminals.get(i);
+		for (Symbol sym : nonterminals) {
 			if (sym.graph == null) {
 				complete = false;
 				errors.SemErr("  No production for " + sym.name);
@@ -1262,8 +1216,7 @@ public class Tab
 		visited = new BitSet(nonterminals.size());
 		visited.set(gramSy.n);
 		MarkReachedNts(gramSy.graph);
-		for (int i = 0; i < nonterminals.size(); i++) {
-			Symbol sym = nonterminals.get(i);
+		for (Symbol sym : nonterminals) {
 			if (!visited.get(sym.n)) {
 				ok = false;
 				errors.Warning("  " + sym.name + " cannot be reached");
@@ -1291,15 +1244,13 @@ public class Tab
 		// a nonterminal is marked if it can be derived to terminal symbols
 		do {
 			changed = false;
-			for (int i = 0; i < nonterminals.size(); i++) {
-				Symbol sym = nonterminals.get(i);
+			for (Symbol sym : nonterminals) {
 				if (!mark.get(sym.n) && IsTerm(sym.graph, mark)) {
 					mark.set(sym.n); changed = true;
 				}
 			}
 		} while (changed);
-		for (int i = 0; i < nonterminals.size(); i++) {
-			Symbol sym = nonterminals.get(i);
+		for (Symbol sym : nonterminals) {
 			if (!mark.get(sym.n)) {
 				ok = false;
 				errors.SemErr("  " + sym.name + " cannot be derived to terminals");
@@ -1316,17 +1267,13 @@ public class Tab
 		TreeMap<Symbol, ArrayList<Integer>> xref = new TreeMap<Symbol, ArrayList<Integer>>(new SymbolComp());
 
 		// collect lines where symbols have been defined
-		//foreach (Symbol sym in Symbol.nonterminals) {
-		for (int i = 0; i < nonterminals.size(); i++) {
-			Symbol sym = nonterminals.get(i);
+		for (Symbol sym : nonterminals) {
 			ArrayList<Integer> list = xref.get(sym);
 			if (list == null) {list = new ArrayList<Integer>(); xref.put(sym, list);}
 			list.add(new Integer(- sym.line));
 		}
 		// collect lines where symbols have been referenced
-		//foreach (Node n in Node.nodes) {
-		for (int i = 0; i < nodes.size(); i++) {
-			Node n = nodes.get(i);
+		for (Node n : nodes) {
 			if (n.typ == Node.t || n.typ == Node.wt || n.typ == Node.nt) {
 				ArrayList<Integer> list = xref.get(n.sym);
 				if (list == null) {list = new ArrayList<Integer>(); xref.put(n.sym, list);}
@@ -1345,9 +1292,7 @@ public class Tab
 			trace.Write(Name(sym.name), -12);
 			ArrayList<Integer> list = xref.get(sym);
 			int col = 14;
-			//foreach (int line in list) {
-			for (int j = 0; j < list.size(); j++) {
-				Integer line = list.get(j);
+			for (Integer line : list) {
 				if (col + 5 > 80) {
 					trace.WriteLine();
 					for (col = 1; col <= 14; col++) trace.Write(" ");
