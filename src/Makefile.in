@@ -17,6 +17,7 @@ exec_prefix = @exec_prefix@
 libdir = @libdir@
 htmldir = @htmldir@
 includedir = @includedir@
+mandir = @mandir@/man1
 prefix = @prefix@
 srcdir = @srcdir@
 
@@ -24,8 +25,6 @@ INSTALL      = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 DATA_FILES = $(srcdir)/Coco/Parser.frame $(srcdir)/Coco/Scanner.frame
 DOC_FILES  = $(srcdir)/Coco/Coco-java.atg
-DATA_DIR   = $(datarootdir)/coco-java
-LIB_COCO   = $(libdir)/coco-java
 
 
 # use same directories as ant
@@ -33,23 +32,37 @@ ANT_BUILD = ../build
 ANT_DIST = ../dist
 ANT_CLASSES = $(ANT_BUILD)/classes
 
-COCO = Coco.jar
-WRAPPER = coco-java
+COCOJAR = Coco.jar
+COCONAME = coco-java
+MANEXT = 1.gz
 
-#-------------------------------------------------------------------------------
+#---------------------------------------------------------------------------
+# DESTDIR is designed to facilitate making packages.  Normally it is empty
+#---------------------------------------------------------------------------
+#DESTDIR =
+DEST_BINDIR  = $(DESTDIR)$(bindir)
+DEST_DOCDIR  = $(DESTDIR)$(docdir)
+DEST_DATADIR = $(DESTDIR)$(datarootdir)/$(COCONAME)
+DEST_MANDIR  = $(DESTDIR)$(mandir)
+
+
+#------------------------------------------------------------------------------
 # There should be no need to modify anything below here.
-#-------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
-all: $(ANT_DIST)/$(COCO) $(ANT_DIST)/$(WRAPPER)
+all: \
+    $(ANT_DIST)/$(COCOJAR) \
+    $(ANT_DIST)/$(COCONAME) \
+    $(ANT_DIST)/$(COCONAME).$(MANEXT)
 
 #
 # compile into build/classes/
 # create jar into dist/
 #
-$(ANT_DIST)/$(COCO): $(srcdir)/Coco/*.java
+$(ANT_DIST)/$(COCOJAR): $(srcdir)/Coco/*.java
 	mkdir -p $(ANT_CLASSES)
 	mkdir -p $(ANT_DIST)
-	@echo "# create Coco.jar"
+	@echo "# create $(COCOJAR)"
 	@echo "#"
 	$(JAVAC) -d $(ANT_CLASSES) $^
 	$(JAR) cfm $@ $(srcdir)/../manifest.mf -C $(ANT_CLASSES) Coco
@@ -57,13 +70,23 @@ $(ANT_DIST)/$(COCO): $(srcdir)/Coco/*.java
 #
 # create coco-java wrapper in dist/
 #
-$(ANT_DIST)/$(WRAPPER): $(WRAPPER).in Makefile
-	@echo "# create coco-java wrapper"
+$(ANT_DIST)/$(COCONAME): $(COCONAME).in Makefile
+	@echo "# create $(COCONAME) wrapper"
 	@echo "#"
-	sed -e "s|\@JAVA\@|$(JAVA)|g" -e "s|\@LIB_COCO\@|$(LIB_COCO)|g" < $< > $@
+	sed -e "s|\@JAVA\@|$(JAVA)|g" -e "s|\@LIB_COCO\@|$(datarootdir)/$(COCONAME)|g" < $< > $@
 	@chmod +x $@
 
-#-------------------------------------------------------------------------------
+#
+# create manpage
+#
+$(ANT_DIST)/$(COCONAME).$(MANEXT): ../etc/$(COCONAME).pod
+	@echo "# create create man pages from pod sources"
+	@echo "#"
+	pod2man -c "User Commands" -r "$(COCONAME)-@PACKAGE_VERSION@" $^ | gzip > $@
+
+
+# -----------------------------------------------------------------------------
+# clean targets
 
 clean:
 	/bin/rm -f *~ \#*
@@ -72,36 +95,41 @@ clean:
 distclean: clean
 	/bin/rm -rf Makefile $(ANT_DIST) $(srcdir)/*.bak $(srcdir)/Coco/*.bak
 
-install_bin_directories:
-	mkdir -p $(bindir)
+# -----------------------------------------------------------------------------
+# installation
 
-install_lib_directories:
-	mkdir -p $(LIB_COCO)
+install_bin_directories:
+	mkdir -p $(DEST_BINDIR)
 
 install_data_directories:
-	mkdir -p $(DATA_DIR)
+	mkdir -p $(DEST_DATADIR)
+
+install_man_directories:
+	mkdir -p $(DEST_MANDIR)
+
 
 install_bin: install_bin_directories
-	$(INSTALL) $(ANT_DIST)/$(WRAPPER) $(bindir)/
-
-install_lib: install_lib_directories
-	$(INSTALL) $(ANT_DIST)/$(COCO) $(LIB_COCO)/
+	$(INSTALL) $(ANT_DIST)/$(COCONAME) $(DEST_BINDIR)/
 
 install_data: install_data_directories
-	@for i in $(DATA_FILES); \
+	@for i in $(DATA_FILES) $(ANT_DIST)/$(COCOJAR); \
 	do \
-		echo $(INSTALL_DATA) $$i $(DATA_DIR)/; \
-		$(INSTALL_DATA) $$i $(DATA_DIR)/; \
+		echo $(INSTALL_DATA) $$i $(DEST_DATADIR)/; \
+		$(INSTALL_DATA) $$i $(DEST_DATADIR)/; \
 		if [ "$$?" != "0" ]; then \
 		  exit 1; \
 		fi; \
 	done
 
-install: all install_bin install_lib install_data
+install_man: install_man_directories
+	$(INSTALL_DATA) $(ANT_DIST)/$(COCONAME).$(MANEXT) $(DEST_MANDIR)/
+
+install: all install_bin install_data install_man
+
 
 .PHONY: all \
-    install_bin install_bin_directories \
-    install_lib install_lib_directories \
-    install_data install_bin_directories
+    install_bin  install_bin_directories \
+    install_data install_data_directories \
+    install_man  install_man_directories
 
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------

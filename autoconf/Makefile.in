@@ -1,13 +1,22 @@
 # -*- sh -*-
 
 # This is a UNIX-only makefile for autoconf
-# -----------------------------------------------------------------------------
 
-all: Coco
+# If you want to change these variables, re-run the configure script.
+INSTALL= @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+libdir = @libdir@
+pkgconfigdir = @pkgconfigdir@
+#---------------------------------------------------------------------------
+# DESTDIR is designed to facilitate making packages.  Normally it is empty
+#---------------------------------------------------------------------------
+#DESTDIR =
+DEST_PKGCONFIGDIR = $(DESTDIR)$(pkgconfigdir)
 
-Coco: makefiles
+all: makefiles
 	cd src && $(MAKE) all
-	@echo
 
 Makefile: configure autoconf/Makefile.in
 	@echo "# Makefile is older than the configure script".
@@ -65,6 +74,7 @@ autoconf/config.guess: /usr/share/misc/config.guess
 
 autoconf/config.sub: /usr/share/misc/config.sub
 	/bin/cp -f /usr/share/misc/config.sub autoconf/config.sub
+
 
 .PHONY: Coco all doc clean docclean distclean install makefiles tar zip
 
