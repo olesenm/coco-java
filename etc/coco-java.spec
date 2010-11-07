@@ -1,14 +1,14 @@
 Summary: The Compiler Generator Coco/R, Java version
 Name: coco-java
 Version: 20101106
-Release: 1
+Release: 2
 License: GPL
-Group:  Development/Languages/C++
+Group:  Development/Languages/Java
 Source0: https://github.com/downloads/olesenm/coco-java/coco-java-%{version}.tar.gz
 URL: http://www.ssw.uni-linz.ac.at/coco/
 Provides: coco-java
-BuildRequires: java-sdk
 Requires: java
+BuildRequires: java-sdk perl
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %description
@@ -40,5 +40,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/*
 
 %changelog
+* Sun Nov  7 2010 Mark Olesen
+- corrected category, build requires perl
+
 * Sat Nov  6 2010 Mark Olesen
 - created spec file
