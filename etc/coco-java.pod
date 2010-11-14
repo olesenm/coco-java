@@ -160,13 +160,16 @@ with the same syntax. For example,
 
 =head1 SEE ALSO
 
-http://www.ssw.uni-linz.ac.at/coco/
+coco-doc(1) for examples
+
+http://www.ssw.uni-linz.ac.at/coco/ for more information
 
 
 =head1 AUTHOR
 
 Hanspeter Moessenboeck, extended by M. Loeberbauer and A. Woess.
 
+First port to Java by W. Ahorner.
 Various improvements by Pat Terry, Mark Olesen.
 
 =cut

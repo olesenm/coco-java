@@ -1,8 +1,17 @@
+coco-java (20101106-1.1) UNRELEASED; urgency=low
+
+  * Non-maintainer upload
+  * Adjust debian packaging for GNU autoconfig system
+  * Update debian/control Depends, Build-Depends, Standards-Version
+  * Include atg in the debian packaging
+
+ -- Mark Olesen <mark.olesen@faurecia.com>  Sun, 14 Nov 2010 10:18:41 +0100
+
 coco-java (20090622-1) unstable; urgency=low
 
   * New upstream release
   * More robust UTF-8 handling in ParserGen.CopySourcePart and
-    Scanner.GetString. 
+    Scanner.GetString.
   * Simplified Coco.atg (import statements handled by ANY).
 
  -- Markus Loeberbauer <Loeberbauer@ssw.jku.at>  Tue, 23 Jun 2009 15:32:29 +0200
@@ -13,7 +22,7 @@ coco-java (20090327-1) unstable; urgency=low
   * Support for pragmas which are part of terminal classes (thanks
     to Serge Voloshenyuk)
   * Support for the escape sequences vertical tab (\v) and audible bell (\a)
-  * Minor change: Code cleanup 
+  * Minor change: Code cleanup
 
  -- Markus Loeberbauer <Loeberbauer@ssw.jku.at>  Fri, 27 Mar 2009 13:18:05 +0100
 
@@ -34,7 +43,7 @@ coco-java (20081001-3) unstable; urgency=low
 
 coco-java (20081001-2) unstable; urgency=low
 
-  * More robust clean target in make file. 
+  * More robust clean target in make file.
 
  -- Markus Loeberbauer <Loeberbauer@ssw.jku.at>  Sat, 04 Oct 2008 10:05:00 +0100
 

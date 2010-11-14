@@ -50,10 +50,11 @@ DEST_MANDIR  = $(DESTDIR)$(mandir)
 # There should be no need to modify anything below here.
 #------------------------------------------------------------------------------
 
-all: \
-    $(ANT_DIST)/$(COCOJAR) \
-    $(ANT_DIST)/$(COCONAME) \
-    $(ANT_DIST)/$(COCONAME).$(MANEXT)
+all: jar bin man
+
+bin: $(ANT_DIST)/$(COCONAME)
+jar: $(ANT_DIST)/$(COCOJAR)
+man: $(ANT_DIST)/$(COCONAME).$(MANEXT)
 
 #
 # compile into build/classes/
@@ -71,6 +72,7 @@ $(ANT_DIST)/$(COCOJAR): $(srcdir)/Coco/*.java
 # create coco-java wrapper in dist/
 #
 $(ANT_DIST)/$(COCONAME): $(COCONAME).in Makefile
+	mkdir -p $(ANT_DIST)
 	@echo "# create $(COCONAME) wrapper"
 	@echo "#"
 	sed -e "s|\@JAVA\@|$(JAVA)|g" -e "s|\@LIB_COCO\@|$(datarootdir)/$(COCONAME)|g" < $< > $@
@@ -80,9 +82,10 @@ $(ANT_DIST)/$(COCONAME): $(COCONAME).in Makefile
 # create manpage
 #
 $(ANT_DIST)/$(COCONAME).$(MANEXT): ../etc/$(COCONAME).pod
+	mkdir -p $(ANT_DIST)
 	@echo "# create create man pages from pod sources"
 	@echo "#"
-	pod2man -c "User Commands" -r "$(COCONAME)-@PACKAGE_VERSION@" $^ | gzip > $@
+	pod2man -c "User Commands" -r "$(COCONAME)-@PACKAGE_VERSION@" $^ | gzip -9 > $@
 
 
 # -----------------------------------------------------------------------------
@@ -127,7 +130,7 @@ install_man: install_man_directories
 install: all install_bin install_data install_man
 
 
-.PHONY: all \
+.PHONY: all bin jar man \
     install_bin  install_bin_directories \
     install_data install_data_directories \
     install_man  install_man_directories
