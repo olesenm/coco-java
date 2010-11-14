@@ -49,8 +49,8 @@ mkdir -p $builddir
     exit 1
 }
 
-echo "compile Coco executable"
-echo "~~~~~~~~~~~~~~~~~~~~~~~"
+echo "compile Coco jar file"
+echo "~~~~~~~~~~~~~~~~~~~~~"
 echo "javac -d $builddir $warn src/Coco/*.java"
 echo
 
@@ -59,10 +59,11 @@ javac -d $builddir $warn src/Coco/*.java
 if [ $? -eq 0 ]
 then
     echo
-    echo "create Coco.jar file"
-    echo "    jar cfm Coco.jar manifest.mf -C $builddir Coco"
+    echo "create dist/Coco.jar file"
+    echo "    jar cfm dist/Coco.jar manifest.mf -C $builddir Coco"
     echo
-    jar cfm Coco.jar manifest.mf -C $builddir Coco
+    mkdir -p dist
+    jar cfm dist/Coco.jar manifest.mf -C $builddir Coco
 else
     echo
     echo "errors detected in compilation"
