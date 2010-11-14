@@ -34,7 +34,7 @@ ANT_CLASSES = $(ANT_BUILD)/classes
 
 COCOJAR = Coco.jar
 COCONAME = coco-java
-MANEXT = 1.gz
+MANEXT = .1.gz
 
 #---------------------------------------------------------------------------
 # DESTDIR is designed to facilitate making packages.  Normally it is empty
@@ -54,7 +54,13 @@ all: jar bin man
 
 bin: $(ANT_DIST)/$(COCONAME)
 jar: $(ANT_DIST)/$(COCOJAR)
-man: $(ANT_DIST)/$(COCONAME).$(MANEXT)
+man: $(ANT_DIST)/$(COCONAME)$(MANEXT)
+
+#
+# (re)create the parser from the atg
+#
+parser: jar
+	$(JAVA) -jar $(ANT_DIST)/$(COCOJAR) $(srcdir)/Coco/Coco-java.atg -bak
 
 #
 # compile into build/classes/
@@ -81,7 +87,7 @@ $(ANT_DIST)/$(COCONAME): $(COCONAME).in Makefile
 #
 # create manpage
 #
-$(ANT_DIST)/$(COCONAME).$(MANEXT): ../etc/$(COCONAME).pod
+$(ANT_DIST)/$(COCONAME)$(MANEXT): ../etc/$(COCONAME).pod
 	mkdir -p $(ANT_DIST)
 	@echo "# create create man pages from pod sources"
 	@echo "#"
@@ -125,12 +131,12 @@ install_data: install_data_directories
 	done
 
 install_man: install_man_directories
-	$(INSTALL_DATA) $(ANT_DIST)/$(COCONAME).$(MANEXT) $(DEST_MANDIR)/
+	$(INSTALL_DATA) $(ANT_DIST)/$(COCONAME)$(MANEXT) $(DEST_MANDIR)/
 
 install: all install_bin install_data install_man
 
 
-.PHONY: all bin jar man \
+.PHONY: all bin jar man parser \
     install_bin  install_bin_directories \
     install_data install_data_directories \
     install_man  install_man_directories
