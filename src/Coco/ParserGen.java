@@ -141,11 +141,11 @@ public class ParserGen
   }
 
 
-
   void CopySourcePart(Position pos, int indent) {
     // Copy text described by pos from atg to gen
     tab.CopySourcePart(gen, pos, indent);
   }
+
 
   void GenErrorMsg(int errTyp, Symbol sym) {
     errorNr++;
@@ -418,7 +418,8 @@ public class ParserGen
 
     OpenGen();
     CopyFramePart("-->begin", false);
-    CopySourcePart(tab.copyPos, 0);
+    tab.CopySourcePart(gen, tab.copyPos, 0);
+    tab.AddNotice(gen);
 
     if (tab.nsName != null && tab.nsName.length() > 0) {
       gen.print("package ");

@@ -989,6 +989,7 @@ public class DFA
     OpenGen();
     CopyFramePart("-->begin", false);
     tab.CopySourcePart(gen, tab.copyPos, 0);
+    tab.AddNotice(gen);
 
     /* add package name, if it exists */
     if (tab.nsName != null && tab.nsName.length() > 0) {

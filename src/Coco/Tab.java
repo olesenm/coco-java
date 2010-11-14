@@ -1446,6 +1446,14 @@ public class Tab
 		}
 	}
 
+	void AddNotice(PrintWriter dest) {
+		dest.println
+		(
+		    "// This file was generated with Coco/R Java, version: "
+		  + Coco.VERSION
+		);
+	}
+
 }
 
 
