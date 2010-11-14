@@ -45,6 +45,7 @@ Options:
   -trace     <String>    trace with output to trace.txt
   -o         <Dir>       output directory
   -bak                   save existing Parser/Scanner files as .bak
+  -version               exit after displaying version information
   -help                  print this usage
 @endverbatim
 The valid trace string values are listed below.
@@ -116,10 +117,16 @@ import java.io.File;
 //! Entry point for standalone coco-java
 public class Coco
 {
-	public static void printUsage (String mesage) {
+	//! The version number (should correspond to the ISO-date)
+	public static final String VERSION = "20101106";
+
+	static void printUsage (final String message) {
+		if (message != null) {
+			System.out.println("Error: " + message);
+		}
 		System.out.println
 		(
-			"Usage: coco-java Grammar.atg {Option}\n" +
+			"\nUsage: coco-java Grammar.atg {Option}\n" +
 			"Options:\n" +
 			"  -package <Name>      eg, My.Package.Name\n" +
 			"  -prefix  <Name>      for unique Parser/Scanner file names\n" +
@@ -127,6 +134,7 @@ public class Coco
 			"  -trace   <String>    trace with output to trace.txt\n" +
 			"  -o       <Dir>       output directory\n" +
 			"  -bak                 save existing Parser/Scanner files as .bak\n" +
+			"  -version             exit after displaying version information\n" +
 			"  -help                print this usage\n" +
 			"\nValid characters in the trace string:\n" +
 			"  A  trace automaton\n" +
@@ -145,18 +153,28 @@ public class Coco
 	}
 
 	public static void main (String[] arg) {
-		System.out.println("Coco/R Java (06 Nov 2010)");
+		System.out.println("Coco/R Java, version: " + VERSION);
+
 		String srcName = null, nsName = null, prefixName = null;
 		String frameDir = null, ddtString = null, outDir = null;
 		boolean makeBackup = false;
 		int retVal = 1;
 
-		for (int i = 0; i < arg.length; i++) {
-			if (arg[i].equals("-help")) {
+		// pass 1: find -help, -version options
+		for (String opt : arg) {
+			if (opt.equals("-help")) {
 				printUsage(null);
 				System.exit(0);
 			}
-			else if (arg[i].equals("-package")) {
+			if (opt.equals("-version")) {
+				// version already printed above
+				System.exit(0);
+			}
+		}
+
+		// pass 2: process other options
+		for (int i = 0; i < arg.length; i++) {
+			if (arg[i].equals("-package")) {
 				if (++i == arg.length) {
 					printUsage("missing parameter on -package");
 					System.exit(retVal);
@@ -195,7 +213,7 @@ public class Coco
 				makeBackup = true;
 			}
 			else if (arg[i].charAt(0) == '-') {
-				printUsage("Error: unknown option: '" + arg[i] + "'");
+				printUsage("unknown option: '" + arg[i] + "'");
 				System.exit(retVal);
 			}
 			else if (srcName != null) {
