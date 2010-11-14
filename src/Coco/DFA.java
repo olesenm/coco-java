@@ -32,18 +32,18 @@ License
 \*---------------------------------------------------------------------------*/
 package Coco;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.Reader;                /* pdt */
-import java.io.BufferedReader;        /* pdt */
-import java.io.FileReader;            /* pdt */
-import java.io.PrintWriter;           /* pdt */
-import java.io.BufferedWriter;        /* pdt */
-import java.io.FileWriter;            /* pdt */
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.io.Reader;
 import java.util.BitSet;
-import java.util.Map;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 //-----------------------------------------------------------------------------
 //  State
@@ -310,8 +310,6 @@ class CharSet
 //! Generation of the Scanner Automaton
 public class DFA
 {
-  static final int EOF = -1;
-
   public int maxStates;
   public int lastStateNr;      //!< highest state number
   public State firstState;
@@ -327,14 +325,6 @@ public class DFA
   Parser parser;               // other Coco objects
   Tab tab;
   Errors errors;
-
-  private int framRead() {
-    try {
-      return fram.read();
-    } catch (java.io.IOException e) {
-      throw new FatalError("Error reading Scanner.frame");
-    }
-  }
 
   //---------- Output primitives
   private String Ch(char ch) {
@@ -840,29 +830,12 @@ public class DFA
     gen.println("\t}");
   }
 
-    void CopyFramePart(String stop, boolean doOutput) {
-        char startCh = stop.charAt(0);
-        int endOfStopString = stop.length()-1;
-        int ch = framRead();
-        while (ch != EOF) {    // not EOF
-            if (ch == startCh) {
-                int i = 0;
-                do {
-                    if (i == endOfStopString) return; // stop[0..i] found
-                    ch = framRead(); i++;
-                } while (ch == stop.charAt(i));
-                // stop[0..i-1] found; continue with last read character
-                if (doOutput)
-                    gen.print(stop.substring(0, i));
-            } else {
-                if (doOutput)
-                    gen.print((char)ch);
-                ch = framRead();
-            }
-        }
-        throw new FatalError("Incomplete or corrupt scanner frame file");
-    }
-
+  void CopyFramePart(String stop, boolean doOutput) {
+      boolean ok = tab.CopyFramePart(fram, gen, stop, doOutput);
+      if (!ok) {
+          throw new FatalError("Incomplete or corrupt scanner frame file");
+      }
+  }
 
   void CopyFramePart(String stop) {
     CopyFramePart(stop, true);

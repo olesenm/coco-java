@@ -32,6 +32,8 @@ License
 \*---------------------------------------------------------------------------*/
 package Coco;
 
+import java.io.PrintWriter;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Comparator;
@@ -39,8 +41,6 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Iterator;
-
-import java.io.PrintWriter;
 
 
 // ----------------------------------------------------------------------------
@@ -1383,6 +1383,52 @@ public class Tab
 		}
 	}
 	//! @endcond
+
+	//! read a character or throw an exception
+	private int readChar(Reader in) {
+		try {
+			return in.read();
+		} catch (java.io.IOException e) {
+			throw new FatalError("Error reading frame");
+		}
+	}
+
+    public boolean CopyFramePart
+    (
+        Reader istr,
+        PrintWriter ostr,
+        String stop,
+        boolean doOutput
+    )
+    {
+        char startCh = stop.charAt(0);
+        int endOfStopString = stop.length()-1;
+        int ch = readChar(istr);
+        while (ch != -1) {    // not EOF
+            if (ch == startCh) {
+                int i = 0;
+                do {
+                    if (i == endOfStopString)
+                        return true; // stop[0..i] found
+                    ch = readChar(istr); i++;
+                } while (ch == stop.charAt(i));
+                // stop[0..i-1] found; continue with last read character
+                if (doOutput)
+                    ostr.print(stop.substring(0, i));
+            } else {
+                if (doOutput)
+                    ostr.print((char)ch);
+                ch = readChar(istr);
+            }
+        }
+
+        return false;
+    }
+
+    public boolean CopyFramePart(Reader istr, PrintWriter ostr, final String stop)
+    {
+        return CopyFramePart(istr, ostr, stop, true);
+    }
 
 	void CopySourcePart(PrintWriter dest, Position pos, int indent) {
 		// Copy text described by pos from atg to dest
