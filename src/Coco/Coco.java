@@ -152,46 +152,46 @@ public class Coco
 		int retVal = 1;
 
 		for (int i = 0; i < arg.length; i++) {
-			if (arg[i].compareTo("-help") == 0) {
+			if (arg[i].equals("-help")) {
 				printUsage(null);
 				System.exit(0);
 			}
-			else if (arg[i].compareTo("-package") == 0) {
+			else if (arg[i].equals("-package")) {
 				if (++i == arg.length) {
 					printUsage("missing parameter on -package");
 					System.exit(retVal);
 				}
 				nsName = arg[i];
 			}
-			else if (arg[i].compareTo("-prefix") == 0) {
+			else if (arg[i].equals("-prefix")) {
 				if (++i == arg.length) {
 					printUsage("missing parameter on -prefix");
 					System.exit(retVal);
 				}
 				prefixName = arg[i];
 			}
-			else if (arg[i].compareTo("-frames") == 0) {
+			else if (arg[i].equals("-frames")) {
 				if (++i == arg.length) {
 					printUsage("missing parameter on -frames");
 					System.exit(retVal);
 				}
 				frameDir = arg[i];
 			}
-			else if (arg[i].compareTo("-trace") == 0) {
+			else if (arg[i].equals("-trace")) {
 				if (++i == arg.length) {
 					printUsage("missing parameter on -trace");
 					System.exit(retVal);
 				}
 				ddtString = arg[i];
 			}
-			else if (arg[i].compareTo("-o") == 0) {
+			else if (arg[i].equals("-o")) {
 				if (++i == arg.length) {
 					printUsage("missing parameter on -o");
 					System.exit(retVal);
 				}
 				outDir = arg[i];
 			}
-			else if (arg[i].compareTo("-bak") == 0) {
+			else if (arg[i].equals("-bak")) {
 				makeBackup = true;
 			}
 			else if (arg[i].charAt(0) == '-') {

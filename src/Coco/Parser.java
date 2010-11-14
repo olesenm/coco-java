@@ -249,7 +249,7 @@ static final int isIdent   = 0;
 		}
 		Expect(21);
 		Expect(1);
-		if (grammarName.compareTo(t.val) != 0)
+		if (!grammarName.equals(t.val))
 		 SemErr("name does not match grammar name");
 		tab.gramSy = tab.FindSym(grammarName);
 		if (tab.gramSy == null)

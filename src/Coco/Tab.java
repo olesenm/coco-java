@@ -296,10 +296,10 @@ public class Tab
 
 	public Symbol FindSym(String name) {
 		for (Symbol s : terminals) {
-			if (s.name.compareTo(name) == 0) return s;
+			if (s.name.equals(name)) return s;
 		}
 		for (Symbol s : nonterminals) {
-			if (s.name.compareTo(name) == 0) return s;
+			if (s.name.equals(name)) return s;
 		}
 		return null;
 	}
@@ -585,7 +585,7 @@ public class Tab
 	public int dummyName = 'A';
 
 	public CharClass NewCharClass(String name, CharSet s) {
-		if (name.compareTo("#") == 0) name = "#" + (char)dummyName++;
+		if (name.equals("#")) name = "#" + (char)dummyName++;
 		CharClass c = new CharClass(name, s);
 		c.n = classes.size();
 		classes.add(c);
@@ -594,7 +594,7 @@ public class Tab
 
 	public CharClass FindCharClass(String name) {
 		for (CharClass c : classes) {
-			if (c.name.compareTo(name) == 0) return c;
+			if (c.name.equals(name)) return c;
 		}
 		return null;
 	}
@@ -1322,7 +1322,7 @@ public class Tab
 		}
 		String name  = str.substring(1, fndEqual);  // skip leading '$'
 		String value = str.substring(fndEqual+1);
-		if (name.compareTo("package") == 0)
+		if (name.equals("package"))
 		{
 			// set package only if not already set
 			if (nsName == null)
@@ -1331,7 +1331,7 @@ public class Tab
 				System.out.println("using package: '" + nsName + "'");
 			}
 		}
-		else if (name.compareTo("prefix") == 0)
+		else if (name.equals("prefix"))
 		{
 			// set prefix only if not already set
 			if (prefixName == null)
@@ -1340,13 +1340,13 @@ public class Tab
 				System.out.println("using prefix: '" + prefixName + "'");
 			}
 		}
-		else if (name.compareTo("trace") == 0)
+		else if (name.equals("trace"))
 		{
 			SetDDT(value);
 		}
-		else if (name.compareTo("define") == 0)
+		else if (name.equals("define"))
 		{
-			if (value.compareTo("EXPLICIT_EOF") == 0) {
+			if (value.equals("EXPLICIT_EOF")) {
 				explicitEOF = true;
 			}
 		}

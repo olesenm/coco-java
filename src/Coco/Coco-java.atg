@@ -152,7 +152,7 @@ Coco                            (. Symbol sym; Graph g; String grammarName; Char
                                  .)
     WEAK '.'
   }
-  "END" ident                   (. if (grammarName.compareTo(t.val) != 0)
+  "END" ident                   (. if (!grammarName.equals(t.val))
                                      SemErr("name does not match grammar name");
                                    tab.gramSy = tab.FindSym(grammarName);
                                    if (tab.gramSy == null)
